@@ -15,7 +15,7 @@
 
 | 字段 | 值 |
 | --- | --- |
-| 接入点 | `rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080` |
+| 接入点 | 见 `.env.example` 中的 `ROCKETMQ_ENDPOINTS` |
 
 ### Topic 映射
 
@@ -171,7 +171,8 @@ cd java && mvn -B compile --file pom.xml -DskipTests
 ```
 
 **修改配置**：
-- `ProducerSingleton.java`：`ENDPOINTS` 改为 `rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080`，清空 `ACCESS_KEY`/`SECRET_KEY`
+
+- `ProducerSingleton.java`：`ENDPOINTS` 改为环境变量，清空 `ACCESS_KEY`/`SECRET_KEY`
 - `ProducerNormalMessageExample.java`：topic → `NormalTest`
 - `ProducerFifoMessageExample.java`：topic → `OrderTest`
 - `ProducerDelayMessageExample.java`：topic → `TimerTest`
@@ -180,12 +181,14 @@ cd java && mvn -B compile --file pom.xml -DskipTests
 - `SimpleConsumerExample.java`：endpoints/topic(consumerGroup→`SimpleConsumer`, topic→`NormalTest`)
 
 **Producer 测试**（按顺序运行）：
+
 1. `ProducerNormalMessageExample` → 发送到 `NormalTest`
 2. `ProducerFifoMessageExample` → 发送到 `OrderTest`
 3. `ProducerDelayMessageExample` → 发送到 `TimerTest`
 4. `ProducerTransactionMessageExample` → 发送到 `TransTest`
 
 **Consumer 测试**（每个运行 15 秒后 kill）：
+
 1. `PushConsumerExample` → 消费组 `PushConsumer`，订阅 `NormalTest`
 2. `SimpleConsumerExample` → 消费组 `SimpleConsumer`，订阅 `NormalTest`
 
@@ -196,17 +199,20 @@ cd golang && go build ./...
 ```
 
 **修改配置**：每个 producer/consumer 的 `main.go`：
-- `Endpoint` → `rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080`
+
+- `Endpoint` → 环境变量 `ROCKETMQ_ENDPOINT`
 - 清空 `AccessKey`/`SecretKey`
 - `Topic` 按类型设置
 
 **Producer 测试**：
+
 1. `producer/normal/main.go` → `NormalTest`
 2. `producer/fifo/main.go` → `OrderTest`
 3. `producer/delay/main.go` → `TimerTest`
 4. `producer/transaction/main.go` → `TransTest`
 
 **Consumer 测试**（每个运行 15 秒后 kill）：
+
 1. `consumer/push_consumer/main.go` → `PushConsumer`，`NormalTest`
 2. `consumer/simple_consumer/main.go` → `SimpleConsumer`，`NormalTest`
 
@@ -219,12 +225,14 @@ cd cpp && mkdir -p build && cd build && cmake .. && make -j $(nproc)
 > 需先安装 gRPC、protobuf、absl、gflags 等 C++ 依赖（从源码编译或使用 vcpkg）
 
 **Producer 测试**（命令行传参）：
-1. `ExampleProducer` → `--access_point=rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080 --topic=NormalTopic`
-2. `ExampleFifoProducer` → `--access_point=... --topic=OrderTest`
-3. `ExampleProducerWithTimedMessage` → `--access_point=... --topic=TimerTest`
-4. `ExampleProducerWithTransactionalMessage` → `--access_point=... --topic=TransTest`
+
+1. `ExampleProducer` → `--access_point=$ROCKETMQ_ENDPOINT --topic=NormalTopic`
+2. `ExampleFifoProducer` → `--access_point=$ROCKETMQ_ENDPOINT --topic=OrderTest`
+3. `ExampleProducerWithTimedMessage` → `--access_point=$ROCKETMQ_ENDPOINT --topic=TimerTest`
+4. `ExampleProducerWithTransactionalMessage` → `--access_point=$ROCKETMQ_ENDPOINT --topic=TransTest`
 
 **Consumer 测试**（每个运行 15 秒后 kill）：
+
 1. `ExamplePushConsumer` → 消费组 `PushConsumer`，`NormalTopic`
 2. `ExampleSimpleConsumer` → 消费组 `SimpleConsumer`，`NormalTopic`
 
@@ -235,16 +243,19 @@ cd csharp && dotnet build
 ```
 
 **修改配置**：
-- 设置环境变量 `ROCKETMQ_ENDPOINT=rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080`
+
+- 设置环境变量 `ROCKETMQ_ENDPOINT`（具体值见 `.env.example`）
 - 修改各 Example 文件中的 topic 常量
 
 **Producer 测试**：
+
 1. `ProducerNormalMessageExample` → `NormalTest`
 2. `ProducerFifoMessageExample` → `OrderTest`
 3. `ProducerDelayMessageExample` → `TimerTest`
 4. `ProducerTransactionMessageExample` → `TransTest`
 
 **Consumer 测试**（每个运行 15 秒后 kill）：
+
 1. `PushConsumerExample` → `PushConsumer`，`NormalTest`
 2. `SimpleConsumerExample` → `SimpleConsumer`，`NormalTest`
 
@@ -255,16 +266,19 @@ cd rust && cargo build
 ```
 
 **修改配置**：
-- 各 example 中 `set_access_url` → `rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080`
+
+- 各 example 中 `set_access_url` → 环境变量 `ROCKETMQ_ENDPOINT`
 - topic 按类型设置
 
 **Producer 测试**：
+
 1. `producer.rs` → `NormalTest`
 2. `fifo_producer.rs` → `OrderTest`
 3. `delay_producer.rs` → `TimerTest`
 4. `transaction_producer.rs` → `TransTest`
 
 **Consumer 测试**（每个运行 15 秒后 kill）：
+
 1. `push_consumer.rs` → `PushConsumer`，`NormalTest`
 2. `simple_consumer.rs` → `SimpleConsumer`，`NormalTest`
 
@@ -275,16 +289,19 @@ cd python && python3.9 -c "pass"
 ```
 
 **修改配置**：
-- 各 example 中 `endpoints` → `rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080`
+
+- 各 example 中 `endpoints` → 环境变量 `ROCKETMQ_ENDPOINTS`
 - topic 按类型设置
 
 **Producer 测试**：
+
 1. `normal_producer_example.py` → `NormalTest`
 2. `fifo_producer_example.py` → `OrderTest`
 3. `delay_producer_example.py` → `TimerTest`
 4. `transaction_producer_example.py` → `TransTest`
 
 **Consumer 测试**（每个运行 15 秒后 kill）：
+
 1. `push_consumer_example.py` → `PushConsumer`，`NormalTest`
 2. `simple_consumer_example.py` → `SimpleConsumer`，`NormalTest`
 
@@ -295,16 +312,19 @@ cd nodejs && npm install && npm run init && npm run build
 ```
 
 **修改配置**：
-- 设置环境变量 `ROCKETMQ_NODEJS_CLIENT_ENDPOINTS=rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080`
+
+- 设置环境变量 `ROCKETMQ_NODEJS_CLIENT_ENDPOINTS`（具体值见 `.env.example`）
 - 修改 `ProducerSingleton.ts` 中 topics 映射
 
 **Producer 测试**：
+
 1. `ProducerNormalMessageExample.ts` → `NormalTest`
 2. `ProducerFifoMessageExample.ts` → `OrderTest`
 3. `ProducerDelayMessageExample.ts` → `TimerTest`
 4. `ProducerTransactionMessageExample.ts` → `TransTest`
 
 **Consumer 测试**（每个运行 15 秒后 kill）：
+
 1. `PushConsumer.ts` → `PushConsumer`，`NormalTest`
 2. `SimpleConsumer.ts` → `SimpleConsumer`，`NormalTest`
 

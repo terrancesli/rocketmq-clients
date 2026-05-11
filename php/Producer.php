@@ -35,10 +35,15 @@ class Producer
     public function init()
     {
         $clientId = 'missyourlove' . '@' . posix_getpid() . '@' . rand(0, 10) . '@' . $this->getRandStr(10);
-        $client = new MessagingServiceClient('rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080', [
+        $endpoint = getenv('ROCKETMQ_ENDPOINTS') ?: '127.0.0.1:8080';
+        $accessKey = getenv('ROCKETMQ_ACCESS_KEY') ?: '';
+        $secretKey = getenv('ROCKETMQ_SECRET_KEY') ?: '';
+        $client = new MessagingServiceClient($endpoint, [
             'credentials' => ChannelCredentials::createInsecure(),
-            'update_metadata' => function ($metaData) use ($clientId) {
-                $metaData['authorization'] = 'Mhbct2T68T0zsbC3:qxi3NLwMMy7sL431';
+            'update_metadata' => function ($metaData) use ($clientId, $accessKey, $secretKey) {
+                if ($accessKey && $secretKey) {
+                    $metaData['authorization'] = $accessKey . ':' . $secretKey;
+                }
                 $metaData['headers'] = ['clientID' => $clientId];
                 return $metaData;
             }

@@ -1,15 +1,17 @@
 # RocketMQ 测试实例信息
 
 > 本文档记录 RocketMQ 测试实例的连接信息，供开发和调试使用。
+>
+> **实际凭证请配置在 `.env` 文件中（参考 `.env.example`），不要硬编码在代码里。**
 
 ## 实例详情
 
 | 字段        | 值                                                           |
 | ----------- | ------------------------------------------------------------ |
-| 实例 ID     | `rmq-cn-u7c3giqmw0s`                                         |
-| 接入点      | `rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080`   |
-| 地域        | 杭州（cn-hangzhou）                                          |
-| 协议        | gRPC（8080 端口）                                            |
+| 实例 ID | `rmq-cn-u7c3giqmw0s` |
+| 接入点 | 见 `.env.example` 中的 `ROCKETMQ_ENDPOINTS` |
+| 地域 | 杭州（cn-hangzhou） |
+| 协议 | gRPC（8080 端口） |
 
 ## Topic 信息
 
@@ -29,59 +31,28 @@
 | SimpleConsumer      | Simple Consumer | 否     |
 | SimpleOrderConsumer | Simple Consumer | 是     |
 
-## 使用示例
+## 环境变量配置
 
-### Java
+所有语言的示例代码统一通过以下环境变量注入连接信息：
 
-```java
-ClientConfiguration configuration = ClientConfiguration.newBuilder()
-    .setEndpoints("rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080")
-    .build();
-```
+| 环境变量 | 说明 | 示例值 |
+| --- | --- | --- |
+| `ROCKETMQ_ENDPOINTS` | 接入点地址 | `xxx.rmq.aliyuncs.com:8080` |
+| `ROCKETMQ_ACCESS_KEY` | 访问密钥 | `your-access-key` |
+| `ROCKETMQ_SECRET_KEY` | 密钥 | `your-secret-key` |
 
-### Golang
+### 各语言配置方式参考
 
-```go
-config := &config.Config{
-    Endpoints: []string{"rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080"},
-}
-```
+```bash
+# Java / Python / Node.js / PHP
+export ROCKETMQ_ENDPOINTS="your-endpoint:8080"
+export ROCKETMQ_ACCESS_KEY="your-access-key"
+export ROCKETMQ_SECRET_KEY="your-secret-key"
 
-### C++
-
-```cpp
-rocketmq::ClientConfiguration config;
-config.SetEndpoints("rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080");
-```
-
-### C#
-
-```csharp
-var config = new ClientConfig.Builder()
-    .Endpoints("rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080")
-    .Build();
-```
-
-### Rust
-
-```rust
-let config = rocketmq::Config::new("rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080");
-```
-
-### Python
-
-```python
-config = rocketmq.Config(
-    endpoints="rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080"
-)
-```
-
-### Node.js
-
-```typescript
-const client = new Producer({
-  endpoint: 'rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080'
-});
+# Golang (使用 ROCKETMQ_ENDPOINT，无 S)
+export ROCKETMQ_ENDPOINT="your-endpoint:8080"
+export ROCKETMQ_ACCESS_KEY="your-access-key"
+export ROCKETMQ_SECRET_KEY="your-secret-key"
 ```
 
 ## 注意事项
