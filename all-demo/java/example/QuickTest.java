@@ -17,9 +17,9 @@ import org.apache.rocketmq.client.apis.producer.TransactionResolution;
 
 public class QuickTest {
 
-    private static final String ACCESS_KEY = "Mhbct2T68T0zsbC3";
-    private static final String SECRET_KEY = "qxi3NLwMMy7sL431";
-    private static final String ENDPOINTS = "rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080";
+    private static final String ACCESS_KEY = System.getenv("ROCKETMQ_ACCESS_KEY");
+    private static final String SECRET_KEY = System.getenv("ROCKETMQ_SECRET_KEY");
+    private static final String ENDPOINTS = System.getenv("ROCKETMQ_ENDPOINTS");
 
     private static final String TOPIC_NORMAL = "NormalTest";
     private static final String TOPIC_FIFO = "OrderTest";

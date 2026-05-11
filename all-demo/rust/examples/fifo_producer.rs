@@ -29,9 +29,13 @@ async fn main() {
 
     // set which rocketmq proxy to connect
     let mut client_option = ClientOption::default();
-    client_option.set_access_url("rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080");
-    client_option.set_access_key("Mhbct2T68T0zsbC3");
-    client_option.set_secret_key("qxi3NLwMMy7sL431");
+    client_option.set_access_url(&std::env::var("ROCKETMQ_ENDPOINT").unwrap_or_else(|_| "127.0.0.1:8080".to_string()));
+    if let Ok(key) = std::env::var("ROCKETMQ_ACCESS_KEY") {
+        client_option.set_access_key(&key);
+    }
+    if let Ok(secret) = std::env::var("ROCKETMQ_SECRET_KEY") {
+        client_option.set_secret_key(&secret);
+    }
 
     // build and start producer
     let mut producer = Producer::new(producer_option, client_option).unwrap();

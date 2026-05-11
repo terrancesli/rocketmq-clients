@@ -13,11 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from rocketmq import ClientConfiguration, Credentials, Message, Producer
 
 if __name__ == '__main__':
-    endpoints = "rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080"
-    credentials = Credentials("Mhbct2T68T0zsbC3", "qxi3NLwMMy7sL431")
+    endpoints = os.environ.get("ROCKETMQ_ENDPOINTS", "127.0.0.1:8080")
+    access_key = os.environ.get("ROCKETMQ_ACCESS_KEY", "")
+    secret_key = os.environ.get("ROCKETMQ_SECRET_KEY", "")
+    credentials = Credentials(access_key, secret_key)
     config = ClientConfiguration(endpoints, credentials)
     topic = "NormalTest"
     producer = Producer(config, (topic,))

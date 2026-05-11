@@ -35,9 +35,9 @@ import org.apache.rocketmq.client.apis.producer.TransactionChecker;
 public class ProducerSingleton {
     private static volatile Producer PRODUCER;
     private static volatile Producer TRANSACTIONAL_PRODUCER;
-    private static final String ACCESS_KEY = "Mhbct2T68T0zsbC3";
-    private static final String SECRET_KEY = "qxi3NLwMMy7sL431";
-    private static final String ENDPOINTS = "rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080";
+    private static final String ACCESS_KEY = System.getenv("ROCKETMQ_ACCESS_KEY");
+    private static final String SECRET_KEY = System.getenv("ROCKETMQ_SECRET_KEY");
+    private static final String ENDPOINTS = System.getenv("ROCKETMQ_ENDPOINTS");
 
     private ProducerSingleton() {
     }

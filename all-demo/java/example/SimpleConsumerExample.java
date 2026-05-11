@@ -44,10 +44,9 @@ public class SimpleConsumerExample {
         final ClientServiceProvider provider = ClientServiceProvider.loadService();
 
         // Credential provider is optional for client configuration.
-        String accessKey = "Mhbct2T68T0zsbC3";
-        String secretKey = "qxi3NLwMMy7sL431";
-
-        String endpoints = "rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080";
+        String accessKey = System.getenv("ROCKETMQ_ACCESS_KEY");
+        String secretKey = System.getenv("ROCKETMQ_SECRET_KEY");
+        String endpoints = System.getenv("ROCKETMQ_ENDPOINTS");
         SessionCredentialsProvider sessionCredentialsProvider =
             (!accessKey.isEmpty() && !secretKey.isEmpty())
                 ? new StaticSessionCredentialsProvider(accessKey, secretKey) : null;

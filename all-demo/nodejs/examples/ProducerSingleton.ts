@@ -17,7 +17,7 @@
 
 import { SessionCredentials } from '../src';
 
-export const endpoints = process.env.ROCKETMQ_NODEJS_CLIENT_ENDPOINTS ?? 'rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080';
+export const endpoints = process.env.ROCKETMQ_NODEJS_CLIENT_ENDPOINTS ?? '127.0.0.1:8080';
 export const namespace = process.env.ROCKETMQ_NODEJS_CLIENT_NAMESPACE ?? '';
 export const topics = {
   normal: 'NormalTest',
@@ -34,7 +34,7 @@ export const liteTopicConfig = {
   parentTopic: process.env.ROCKETMQ_NODEJS_LITE_PARENT_TOPIC ?? 'yourParentTopic',
 };
 
-export let sessionCredentials: SessionCredentials | undefined = {
-  accessKey: 'Mhbct2T68T0zsbC3',
-  accessSecret: 'qxi3NLwMMy7sL431',
-};
+const accessKey = process.env.ROCKETMQ_ACCESS_KEY ?? '';
+const accessSecret = process.env.ROCKETMQ_SECRET_KEY ?? '';
+export let sessionCredentials: SessionCredentials | undefined =
+  accessKey && accessSecret ? { accessKey, accessSecret } : undefined;

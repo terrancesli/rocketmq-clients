@@ -30,11 +30,15 @@ import (
 )
 
 const (
-	Topic     = "OrderTest"
-	Endpoint  = "rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080"
-	AccessKey = "Mhbct2T68T0zsbC3"
-	SecretKey = "qxi3NLwMMy7sL431"
+	Topic = "OrderTest"
 )
+
+func envOr(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
+}
 
 func main() {
 	// log to console
@@ -42,10 +46,10 @@ func main() {
 	rmq_client.ResetLogger()
 	// In most case, you don't need to create many producers, singleton pattern is more recommended.
 	producer, err := rmq_client.NewProducer(&rmq_client.Config{
-		Endpoint: Endpoint,
+		Endpoint: envOr("ROCKETMQ_ENDPOINT", "127.0.0.1:8080"),
 		Credentials: &credentials.SessionCredentials{
-			AccessKey:    AccessKey,
-			AccessSecret: SecretKey,
+			AccessKey:    envOr("ROCKETMQ_ACCESS_KEY", ""),
+			AccessSecret: envOr("ROCKETMQ_SECRET_KEY", ""),
 		},
 	},
 		rmq_client.WithTopics(Topic),
