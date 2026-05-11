@@ -15,7 +15,7 @@
 
 | 字段 | 值 |
 | --- | --- |
-| 接入点 | `rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080` |
+| 接入点 | `<接入点，见 .env.example>` |
 
 ### Topic 映射
 
@@ -171,7 +171,7 @@ cd java && mvn -B compile --file pom.xml -DskipTests
 ```
 
 **修改配置**：
-- `ProducerSingleton.java`：`ENDPOINTS` 改为 `rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080`，清空 `ACCESS_KEY`/`SECRET_KEY`
+- `ProducerSingleton.java`：`ENDPOINTS` 改为 `<接入点，见 .env.example>`，清空 `ACCESS_KEY`/`SECRET_KEY`
 - `ProducerNormalMessageExample.java`：topic → `NormalTest`
 - `ProducerFifoMessageExample.java`：topic → `OrderTest`
 - `ProducerDelayMessageExample.java`：topic → `TimerTest`
@@ -196,7 +196,7 @@ cd golang && go build ./...
 ```
 
 **修改配置**：每个 producer/consumer 的 `main.go`：
-- `Endpoint` → `rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080`
+- `Endpoint` → `<接入点，见 .env.example>`
 - 清空 `AccessKey`/`SecretKey`
 - `Topic` 按类型设置
 
@@ -219,7 +219,7 @@ cd cpp && mkdir -p build && cd build && cmake .. && make -j $(nproc)
 > 需先安装 gRPC、protobuf、absl、gflags 等 C++ 依赖（从源码编译或使用 vcpkg）
 
 **Producer 测试**（命令行传参）：
-1. `ExampleProducer` → `--access_point=rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080 --topic=NormalTopic`
+1. `ExampleProducer` → `--access_point=<接入点，见 .env.example> --topic=NormalTopic`
 2. `ExampleFifoProducer` → `--access_point=... --topic=OrderTest`
 3. `ExampleProducerWithTimedMessage` → `--access_point=... --topic=TimerTest`
 4. `ExampleProducerWithTransactionalMessage` → `--access_point=... --topic=TransTest`
@@ -235,7 +235,7 @@ cd csharp && dotnet build
 ```
 
 **修改配置**：
-- 设置环境变量 `ROCKETMQ_ENDPOINT=rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080`
+- 设置环境变量 `ROCKETMQ_ENDPOINT=<接入点，见 .env.example>`
 - 修改各 Example 文件中的 topic 常量
 
 **Producer 测试**：
@@ -255,7 +255,7 @@ cd rust && cargo build
 ```
 
 **修改配置**：
-- 各 example 中 `set_access_url` → `rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080`
+- 各 example 中 `set_access_url` → `<接入点，见 .env.example>`
 - topic 按类型设置
 
 **Producer 测试**：
@@ -275,7 +275,7 @@ cd python && python3.9 -c "pass"
 ```
 
 **修改配置**：
-- 各 example 中 `endpoints` → `rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080`
+- 各 example 中 `endpoints` → `<接入点，见 .env.example>`
 - topic 按类型设置
 
 **Producer 测试**：
@@ -295,7 +295,7 @@ cd nodejs && npm install && npm run init && npm run build
 ```
 
 **修改配置**：
-- 设置环境变量 `ROCKETMQ_NODEJS_CLIENT_ENDPOINTS=rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080`
+- 设置环境变量 `ROCKETMQ_NODEJS_CLIENT_ENDPOINTS=<接入点，见 .env.example>`
 - 修改 `ProducerSingleton.ts` 中 topics 映射
 
 **Producer 测试**：

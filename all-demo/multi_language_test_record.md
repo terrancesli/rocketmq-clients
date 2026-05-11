@@ -3,8 +3,7 @@
 ## 测试环境
 
 - **操作系统**: Alibaba Cloud Linux 3 (内核 5.10.134-19.2.al8.x86_64)
-- **RocketMQ 实例**: rmq-cn-u7c3giqmw0s
-- **接入点**: rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080
+- **RocketMQ 实例**: 见 `.env.example`
 - **代码仓库**: https://github.com/apache/rocketmq-clients (master 分支)
 
 ### Topic 映射
