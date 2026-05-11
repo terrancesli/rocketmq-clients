@@ -61,7 +61,7 @@ public:
   /// \param[in] s The status outcome of this RPC
   void OnDone(const grpc::Status & /*s*/) override;
 
-  void write(ExportMetricsServiceRequest request) LOCKS_EXCLUDED(requests_mtx_);
+  void write(ExportMetricsServiceRequest request) ABSL_LOCKS_EXCLUDED(requests_mtx_);
 
 private:
   std::weak_ptr<Client> client_;
@@ -69,7 +69,7 @@ private:
   grpc::ClientContext context_;
 
   /// Pending ExportMetricsServiceRequest items to write to server
-  std::list<ExportMetricsServiceRequest> requests_ GUARDED_BY(requests_mtx_);
+  std::list<ExportMetricsServiceRequest> requests_ ABSL_GUARDED_BY(requests_mtx_);
   absl::Mutex requests_mtx_;
 
   std::atomic_bool inflight_{false};

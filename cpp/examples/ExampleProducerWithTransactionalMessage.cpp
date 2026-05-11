@@ -128,8 +128,8 @@ int main(int argc, char* argv[]) {
     stats_thread.join();
   }
 
-  std::cout << "Wait 5 minutes for potential unresolved transactional message callback" << std::endl;
-  std::this_thread::sleep_for(std::chrono::minutes(5));
+  std::cout << "Wait 10 seconds for potential unresolved transactional message callback" << std::endl;
+  std::this_thread::sleep_for(std::chrono::seconds(10));
 
   return EXIT_SUCCESS;
 }

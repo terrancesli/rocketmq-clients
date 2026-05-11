@@ -54,3 +54,6 @@ golang/*.exe
 python/myvenv/
 python/__pycache__/
 python/dist
+
+# Environment variables (credentials)
+.env

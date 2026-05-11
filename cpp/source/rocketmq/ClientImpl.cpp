@@ -198,13 +198,13 @@ void ClientImpl::start() {
     std::weak_ptr<Client> client_weak_ptr(self());
 #ifdef DEBUG_METRIC_EXPORTING
     opencensus::stats::StatsExporter::SetInterval(absl::Seconds(30));
-    opencensus::stats::StatsExporter::RegisterPushHandler(absl::make_unique<StdoutHandler>());
+    opencensus::stats::StatsExporter::RegisterPushHandler(std::make_unique<StdoutHandler>());
 #else
     opencensus::stats::StatsExporter::SetInterval(absl::Minutes(1));
 #endif
     SPDLOG_INFO("Export client metrics to {}", metric_service_endpoint);
     opencensus::stats::StatsExporter::RegisterPushHandler(
-        absl::make_unique<OpencensusHandler>(metric_service_endpoint, client_weak_ptr));
+        std::make_unique<OpencensusHandler>(metric_service_endpoint, client_weak_ptr));
   }
 }
 
@@ -521,7 +521,7 @@ void ClientImpl::createSession(const std::string& target, bool verify) {
   std::weak_ptr<ClientImpl> client = self();
   auto rpc_client = client_manager_->getRpcClient(target, true);
   SPDLOG_DEBUG("Create a new session for {}", target);
-  auto session = absl::make_unique<SessionImpl>(client, rpc_client);
+  auto session = std::make_unique<SessionImpl>(client, rpc_client);
   {
     absl::MutexLock lk(&session_map_mtx_);
     session_map_.insert_or_assign(target, std::move(session));

@@ -48,11 +48,11 @@ public:
 
   ~PushConsumerImpl() override;
 
-  void buildClientSettings(rmq::Settings& settings) override LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
+  void buildClientSettings(rmq::Settings& settings) override ABSL_LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
 
   void prepareHeartbeatData(HeartbeatRequest& request) override;
 
-  void topicsOfInterest(std::vector<std::string> &topics) override LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
+  void topicsOfInterest(std::vector<std::string> &topics) override ABSL_LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
 
   void start() override;
 
@@ -61,16 +61,16 @@ public:
   void subscribe(const std::string& topic,
                  const std::string& expression,
                  ExpressionType expression_type = ExpressionType::TAG)
-      LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
+      ABSL_LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
 
-  void unsubscribe(const std::string& topic) LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
+  void unsubscribe(const std::string& topic) ABSL_LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
 
   absl::optional<FilterExpression> getFilterExpression(const std::string& topic) const
-      LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
+      ABSL_LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
 
   void registerMessageListener(MessageListener message_listener);
 
-  void scanAssignments() LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
+  void scanAssignments() ABSL_LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
 
   bool selectBroker(const TopicRouteDataPtr& route, std::string& broker_host);
 
@@ -93,15 +93,15 @@ public:
 
   void syncProcessQueue(const std::string& topic,
                         const TopicAssignmentPtr& topic_assignment,
-                        const FilterExpression& filter_expression) LOCKS_EXCLUDED(process_queue_table_mtx_);
+                        const FilterExpression& filter_expression) ABSL_LOCKS_EXCLUDED(process_queue_table_mtx_);
 
   std::shared_ptr<ProcessQueue> getOrCreateProcessQueue(const rmq::MessageQueue& message_queue,
                                                         const FilterExpression& filter_expression)
-      LOCKS_EXCLUDED(process_queue_table_mtx_);
+      ABSL_LOCKS_EXCLUDED(process_queue_table_mtx_);
 
   bool receiveMessage(const rmq::MessageQueue& message_queue,
                       const FilterExpression& filter_expression,
-                      std::string& attempt_id) LOCKS_EXCLUDED(process_queue_table_mtx_);
+                      std::string& attempt_id) ABSL_LOCKS_EXCLUDED(process_queue_table_mtx_);
 
   uint32_t consumeThreadPoolSize() const;
 
@@ -126,7 +126,7 @@ public:
   void wrapAckMessageRequest(const Message& msg, AckMessageRequest& request);
 
   // only for test
-  std::size_t getProcessQueueTableSize() LOCKS_EXCLUDED(process_queue_table_mtx_);
+  std::size_t getProcessQueueTableSize() ABSL_LOCKS_EXCLUDED(process_queue_table_mtx_);
 
   void setCustomExecutor(const Executor& executor) {
     custom_executor_ = executor;
@@ -179,7 +179,7 @@ protected:
 
 private:
   absl::flat_hash_map<std::string, FilterExpression> topic_filter_expression_table_
-      GUARDED_BY(topic_filter_expression_table_mtx_);
+      ABSL_GUARDED_BY(topic_filter_expression_table_mtx_);
   mutable absl::Mutex topic_filter_expression_table_mtx_;
 
   /**
@@ -201,13 +201,13 @@ private:
    * simple-queue-name ==> process-queue
    */
   absl::flat_hash_map<std::string, std::shared_ptr<ProcessQueue>> process_queue_table_
-      GUARDED_BY(process_queue_table_mtx_);
+      ABSL_GUARDED_BY(process_queue_table_mtx_);
   absl::Mutex process_queue_table_mtx_;
 
   Executor custom_executor_;
 
   absl::flat_hash_map<std::string /* Topic */, uint32_t /* Threshold */> throttle_table_
-      GUARDED_BY(throttle_table_mtx_);
+      ABSL_GUARDED_BY(throttle_table_mtx_);
   absl::Mutex throttle_table_mtx_;
 
   int32_t max_delivery_attempts_{MixAll::DEFAULT_MAX_DELIVERY_ATTEMPTS};
@@ -216,9 +216,9 @@ private:
   std::uintptr_t collect_stats_handle_{0};
   static const char* COLLECT_STATS_TASK_NAME;
 
-  void fetchRoutes() LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
+  void fetchRoutes() ABSL_LOCKS_EXCLUDED(topic_filter_expression_table_mtx_);
 
-  void collectCacheStats() LOCKS_EXCLUDED(process_queue_table_mtx_);
+  void collectCacheStats() ABSL_LOCKS_EXCLUDED(process_queue_table_mtx_);
 
   friend class ConsumeMessageService;
   friend class ConsumeFifoMessageService;

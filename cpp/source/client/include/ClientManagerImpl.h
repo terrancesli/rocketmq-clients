@@ -54,7 +54,7 @@ public:
 
   void start() override;
 
-  void shutdown() override LOCKS_EXCLUDED(rpc_clients_mtx_);
+  void shutdown() override ABSL_LOCKS_EXCLUDED(rpc_clients_mtx_);
 
   std::shared_ptr<grpc::Channel> createChannel(const std::string& target_host) override;
 
@@ -72,18 +72,18 @@ public:
                     const QueryRouteRequest& request,
                     std::chrono::milliseconds timeout,
                     const std::function<void(const std::error_code&, const TopicRouteDataPtr&)>& cb) override
-      LOCKS_EXCLUDED(rpc_clients_mtx_);
+      ABSL_LOCKS_EXCLUDED(rpc_clients_mtx_);
 
   /**
    * If inactive RPC clients refer to remote hosts that are absent from topic_route_table_, we need to purge them
    * immediately.
    */
-  std::vector<std::string> cleanOfflineRpcClients() LOCKS_EXCLUDED(clients_mtx_, rpc_clients_mtx_);
+  std::vector<std::string> cleanOfflineRpcClients() ABSL_LOCKS_EXCLUDED(clients_mtx_, rpc_clients_mtx_);
 
   bool send(const std::string& target_host,
             const Metadata& metadata,
             SendMessageRequest& request,
-            SendResultCallback cb) override LOCKS_EXCLUDED(rpc_clients_mtx_);
+            SendResultCallback cb) override ABSL_LOCKS_EXCLUDED(rpc_clients_mtx_);
 
   /**
    * Get a RpcClient according to the given target hosts, which follows scheme specified
@@ -97,17 +97,17 @@ public:
    * @return
    */
   RpcClientSharedPtr getRpcClient(const std::string& target_host, bool need_heartbeat = true) override
-      LOCKS_EXCLUDED(rpc_clients_mtx_);
+      ABSL_LOCKS_EXCLUDED(rpc_clients_mtx_);
 
   static SendResult processSendResponse(const rmq::MessageQueue& message_queue,
                                          const SendMessageResponse& response,
                                          std::error_code& ec);
 
   // only for test
-  void addRpcClient(const std::string& target_host, const RpcClientSharedPtr& client) LOCKS_EXCLUDED(rpc_clients_mtx_);
+  void addRpcClient(const std::string& target_host, const RpcClientSharedPtr& client) ABSL_LOCKS_EXCLUDED(rpc_clients_mtx_);
 
   // Test purpose only
-  void cleanRpcClients() LOCKS_EXCLUDED(rpc_clients_mtx_);
+  void cleanRpcClients() ABSL_LOCKS_EXCLUDED(rpc_clients_mtx_);
 
   void addClientObserver(std::weak_ptr<Client> client) override;
 
@@ -121,7 +121,7 @@ public:
                       const Metadata& metadata,
                       const ReceiveMessageRequest& request,
                       std::chrono::milliseconds timeout,
-                      ReceiveMessageCallback cb) override LOCKS_EXCLUDED(rpc_clients_mtx_);
+                      ReceiveMessageCallback cb) override ABSL_LOCKS_EXCLUDED(rpc_clients_mtx_);
 
   /**
    * Translate protobuf message struct to domain model.
@@ -213,17 +213,17 @@ private:
 
   std::atomic<State> state_;
 
-  std::vector<std::weak_ptr<Client>> clients_ GUARDED_BY(clients_mtx_);
+  std::vector<std::weak_ptr<Client>> clients_ ABSL_GUARDED_BY(clients_mtx_);
   absl::Mutex clients_mtx_;
 
-  absl::flat_hash_map<std::string, std::shared_ptr<RpcClient>> rpc_clients_ GUARDED_BY(rpc_clients_mtx_);
+  absl::flat_hash_map<std::string, std::shared_ptr<RpcClient>> rpc_clients_ ABSL_GUARDED_BY(rpc_clients_mtx_);
   absl::Mutex rpc_clients_mtx_;  // protects rpc_clients_
 
   std::uint32_t heartbeat_task_id_{0};
 
   std::unique_ptr<ThreadPoolImpl> callback_thread_pool_;
 
-  absl::flat_hash_set<std::string> exporter_endpoint_set_ GUARDED_BY(exporter_endpoint_set_mtx_);
+  absl::flat_hash_set<std::string> exporter_endpoint_set_ ABSL_GUARDED_BY(exporter_endpoint_set_mtx_);
   absl::Mutex exporter_endpoint_set_mtx_;
 
   /**

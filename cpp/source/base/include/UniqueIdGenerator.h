@@ -31,7 +31,7 @@ class UniqueIdGenerator {
 public:
   static UniqueIdGenerator& instance();
 
-  std::string next() LOCKS_EXCLUDED(mtx_);
+  std::string next() ABSL_LOCKS_EXCLUDED(mtx_);
 
   static std::string nextUuidV4Std();
 

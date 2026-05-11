@@ -71,7 +71,7 @@ public:
 
   std::unique_ptr<TransactionImpl> beginTransaction() {
     auto producer = std::weak_ptr<ProducerImpl>(shared_from_this());
-    return absl::make_unique<TransactionImpl>(producer);
+    return std::make_unique<TransactionImpl>(producer);
   }
 
   /**
@@ -90,13 +90,13 @@ public:
    * @param endpoint Address of target host.
    * @return true if client is active; false otherwise.
    */
-  bool isEndpointIsolated(const std::string& endpoint) LOCKS_EXCLUDED(isolated_endpoints_mtx_);
+  bool isEndpointIsolated(const std::string& endpoint) ABSL_LOCKS_EXCLUDED(isolated_endpoints_mtx_);
 
   /**
    * Note: This function is purpose-made public such that the whole isolate/add-back mechanism can be properly tested.
    * @param target Endpoint of the target host
    */
-  void isolateEndpoint(const std::string& target) LOCKS_EXCLUDED(isolated_endpoints_mtx_);
+  void isolateEndpoint(const std::string& target) ABSL_LOCKS_EXCLUDED(isolated_endpoints_mtx_);
 
   std::size_t maxAttemptTimes() const {
     return max_attempt_times_;
@@ -126,9 +126,9 @@ public:
 
   void buildClientSettings(rmq::Settings& settings) override;
 
-  void topicsOfInterest(std::vector<std::string> &topics) override LOCKS_EXCLUDED(topics_mtx_);
+  void topicsOfInterest(std::vector<std::string> &topics) override ABSL_LOCKS_EXCLUDED(topics_mtx_);
 
-  void withTopics(const std::vector<std::string> &topics) LOCKS_EXCLUDED(topics_mtx_);
+  void withTopics(const std::vector<std::string> &topics) ABSL_LOCKS_EXCLUDED(topics_mtx_);
 
   const PublishStats& stats() const {
     return stats_;
@@ -146,13 +146,13 @@ protected:
   void notifyClientTermination() override;
 
 private:
-  absl::flat_hash_map<std::string, TopicPublishInfoPtr> topic_publish_info_table_ GUARDED_BY(topic_publish_info_mtx_);
+  absl::flat_hash_map<std::string, TopicPublishInfoPtr> topic_publish_info_table_ ABSL_GUARDED_BY(topic_publish_info_mtx_);
   absl::Mutex topic_publish_info_mtx_;  // protects topic_publish_info_
   std::size_t max_attempt_times_{MixAll::MAX_SEND_MESSAGE_ATTEMPT_TIMES_};
   int32_t failed_times_{0};  // only for test
   uint32_t compress_body_threshold_;
   TransactionChecker transaction_checker_;
-  std::vector<std::string> topics_ GUARDED_BY(topics_mtx_);
+  std::vector<std::string> topics_ ABSL_GUARDED_BY(topics_mtx_);
   absl::Mutex topics_mtx_;
 
   PublishStats stats_;
@@ -163,9 +163,9 @@ private:
    * If not found, query name servers.
    */
   void getPublishInfoAsync(const std::string& topic, const PublishInfoCallback& cb)
-      LOCKS_EXCLUDED(topic_publish_info_mtx_);
+      ABSL_LOCKS_EXCLUDED(topic_publish_info_mtx_);
 
-  void cachePublishInfo(const std::string&, TopicPublishInfoPtr info) LOCKS_EXCLUDED(topic_publish_info_mtx_);
+  void cachePublishInfo(const std::string&, TopicPublishInfoPtr info) ABSL_LOCKS_EXCLUDED(topic_publish_info_mtx_);
 
   TopicPublishInfoPtr getPublishInfo(const std::string& topic);
 
@@ -181,7 +181,7 @@ private:
 
   void send0(MessageConstPtr message, const SendCallback& callback, std::vector<rmq::MessageQueue> list);
 
-  void isolatedEndpoints(absl::flat_hash_set<std::string>& endpoints) LOCKS_EXCLUDED(isolated_endpoints_mtx_);
+  void isolatedEndpoints(absl::flat_hash_set<std::string>& endpoints) ABSL_LOCKS_EXCLUDED(isolated_endpoints_mtx_);
 
   friend class ProducerBuilder;
 };

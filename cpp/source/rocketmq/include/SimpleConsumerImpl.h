@@ -43,9 +43,9 @@ public:
 
   void shutdown() override;
 
-  void subscribe(std::string topic, FilterExpression expression) LOCKS_EXCLUDED(subscriptions_mtx_);
+  void subscribe(std::string topic, FilterExpression expression) ABSL_LOCKS_EXCLUDED(subscriptions_mtx_);
 
-  void unsubscribe(const std::string& topic) LOCKS_EXCLUDED(subscriptions_mtx_);
+  void unsubscribe(const std::string& topic) ABSL_LOCKS_EXCLUDED(subscriptions_mtx_);
 
   void receive(std::size_t limit, std::chrono::milliseconds invisible_duration, ReceiveCallback callback);
 
@@ -65,14 +65,14 @@ protected:
   void topicsOfInterest(std::vector<std::string> &topics) override;
 
 private:
-  absl::flat_hash_map<std::string, FilterExpression> subscriptions_ GUARDED_BY(subscriptions_mtx_);
+  absl::flat_hash_map<std::string, FilterExpression> subscriptions_ ABSL_GUARDED_BY(subscriptions_mtx_);
   mutable absl::Mutex subscriptions_mtx_;
 
-  absl::flat_hash_map<std::string, std::vector<rmq::Assignment>> topic_assignments_ GUARDED_BY(topic_assignments_mtx_);
+  absl::flat_hash_map<std::string, std::vector<rmq::Assignment>> topic_assignments_ ABSL_GUARDED_BY(topic_assignments_mtx_);
   absl::Mutex topic_assignments_mtx_;
 
   std::vector<rmq::Assignment> assignments_;
-  absl::Mutex assignments_mtx_ ACQUIRED_AFTER(topic_assignments_mtx_);
+  absl::Mutex assignments_mtx_ ABSL_ACQUIRED_AFTER(topic_assignments_mtx_);
 
   std::size_t refresh_assignment_task_{0};
 
@@ -80,18 +80,18 @@ private:
 
   std::chrono::milliseconds long_polling_duration_{MixAll::DefaultReceiveMessageTimeout};
 
-  void refreshAssignments0() LOCKS_EXCLUDED(topic_assignments_mtx_, subscriptions_mtx_);
+  void refreshAssignments0() ABSL_LOCKS_EXCLUDED(topic_assignments_mtx_, subscriptions_mtx_);
 
-  void refreshAssignments() LOCKS_EXCLUDED(subscriptions_mtx_);
+  void refreshAssignments() ABSL_LOCKS_EXCLUDED(subscriptions_mtx_);
 
   void refreshAssignment(const std::string& topic, std::function<void(const std::error_code&)> cb);
 
   void updateAssignments(const std::string& topic, const std::vector<rmq::Assignment>& assignments)
-      LOCKS_EXCLUDED(assignments_mtx_, topic_assignments_mtx_);
+      ABSL_LOCKS_EXCLUDED(assignments_mtx_, topic_assignments_mtx_);
 
   void wrapAckRequest(const Message& message, AckMessageRequest& request);
 
-  void removeAssignmentsByTopic(const std::string& topic) LOCKS_EXCLUDED(topic_assignments_mtx_, assignments_mtx_);
+  void removeAssignmentsByTopic(const std::string& topic) ABSL_LOCKS_EXCLUDED(topic_assignments_mtx_, assignments_mtx_);
 
   absl::optional<FilterExpression> getFilterExpression(const std::string &topic) const;
 };

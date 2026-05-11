@@ -35,7 +35,7 @@ public:
   TopicPublishInfo(std::weak_ptr<ProducerImpl> producer, absl::string_view topic, TopicRouteDataPtr topic_route_data);
 
   bool selectMessageQueues(absl::optional<std::string> message_group, std::vector<rmq::MessageQueue>& result)
-      LOCKS_EXCLUDED(queue_list_mtx_);
+      ABSL_LOCKS_EXCLUDED(queue_list_mtx_);
 
   void topicRouteData(TopicRouteDataPtr topic_route_data);
 
@@ -44,10 +44,10 @@ public:
    *
    * @return
    */
-  std::vector<rmq::MessageQueue> getMessageQueueList() LOCKS_EXCLUDED(queue_list_mtx_);
+  std::vector<rmq::MessageQueue> getMessageQueueList() ABSL_LOCKS_EXCLUDED(queue_list_mtx_);
 
 private:
-  std::vector<rmq::MessageQueue> queue_list_ GUARDED_BY(queue_list_mtx_);
+  std::vector<rmq::MessageQueue> queue_list_ ABSL_GUARDED_BY(queue_list_mtx_);
   absl::Mutex                                queue_list_mtx_;  // protects message_queue_list_
   std::weak_ptr<ProducerImpl>                producer_;
   std::string                                topic_;

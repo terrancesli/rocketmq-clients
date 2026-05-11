@@ -33,7 +33,7 @@ ConsumeMessageServiceImpl::ConsumeMessageServiceImpl(std::weak_ptr<PushConsumerI
                                                      MessageListener message_listener)
     : state_(State::CREATED),
       thread_count_(thread_count),
-      pool_(absl::make_unique<ThreadPoolImpl>(thread_count_)),
+      pool_(std::make_unique<ThreadPoolImpl>(thread_count_)),
       consumer_(std::move(consumer)),
       message_listener_(message_listener) {
 }

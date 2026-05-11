@@ -30,7 +30,7 @@ public:
   ThreadPoolTest() = default;
 
   void SetUp() override {
-    pool_ = absl::make_unique<ThreadPoolImpl>(2);
+    pool_ = std::make_unique<ThreadPoolImpl>(2);
     pool_->start();
     completed = false;
   }

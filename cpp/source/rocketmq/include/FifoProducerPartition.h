@@ -38,15 +38,15 @@ public:
       : producer_(producer), name_(std::move(name)) {
   }
 
-  void add(FifoContext&& context) LOCKS_EXCLUDED(messages_mtx_);
+  void add(FifoContext&& context) ABSL_LOCKS_EXCLUDED(messages_mtx_);
 
-  void trySend() LOCKS_EXCLUDED(messages_mtx_);
+  void trySend() ABSL_LOCKS_EXCLUDED(messages_mtx_);
 
   void onComplete(const std::error_code& ec, const SendReceipt& receipt, SendCallback& callback);
 
 private:
   std::shared_ptr<ProducerImpl> producer_;
-  std::list<FifoContext> messages_ GUARDED_BY(messages_mtx_);
+  std::list<FifoContext> messages_ ABSL_GUARDED_BY(messages_mtx_);
   absl::Mutex messages_mtx_;
   std::atomic_bool inflight_{false};
   std::string name_;

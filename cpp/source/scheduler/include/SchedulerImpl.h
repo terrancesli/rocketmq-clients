@@ -52,7 +52,7 @@ public:
 
   void start() override;
 
-  void shutdown() override LOCKS_EXCLUDED(tasks_mtx_);
+  void shutdown() override ABSL_LOCKS_EXCLUDED(tasks_mtx_);
 
   /**
    * @functor Pointer to the functor. Lifecycle of this functor should be maintained by the caller.
@@ -62,13 +62,13 @@ public:
    */
   std::uint32_t schedule(const std::function<void(void)>& functor, const std::string& task_name,
                          std::chrono::milliseconds delay, std::chrono::milliseconds interval) override
-      LOCKS_EXCLUDED(tasks_mtx_);
+      ABSL_LOCKS_EXCLUDED(tasks_mtx_);
 
   /**
    * Note:
    * Periodic tasks should be explicitly cancelled once they are no longer needed.
    */
-  void cancel(std::uint32_t task_id) override LOCKS_EXCLUDED(tasks_mtx_);
+  void cancel(std::uint32_t task_id) override ABSL_LOCKS_EXCLUDED(tasks_mtx_);
 
 private:
   asio::io_context context_;
@@ -79,7 +79,7 @@ private:
   std::vector<std::thread> threads_;
   std::atomic<State> state_{State::CREATED};
 
-  absl::flat_hash_map<std::uint32_t, std::shared_ptr<TimerTask>> tasks_ GUARDED_BY(tasks_mtx_);
+  absl::flat_hash_map<std::uint32_t, std::shared_ptr<TimerTask>> tasks_ ABSL_GUARDED_BY(tasks_mtx_);
   absl::Mutex tasks_mtx_;
 
   static void execute(const asio::error_code& ec, std::weak_ptr<TimerTask> task);

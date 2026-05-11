@@ -30,10 +30,10 @@ namespace examples
                     .AddFilter("examples", LogLevel.Information)
                     .AddConsole());
             MqLogManager.UseLoggerFactory(loggerFactory);
-            // ProducerNormalMessageExample.QuickStart().Wait();
-            // ProducerFifoMessageExample.QuickStart().Wait();
-            // ProducerDelayMessageExample.QuickStart().Wait();
-            // ProducerTransactionMessageExample.QuickStart().Wait();
+            ProducerNormalMessageExample.QuickStart().Wait();
+            ProducerFifoMessageExample.QuickStart().Wait();
+            ProducerDelayMessageExample.QuickStart().Wait();
+            ProducerTransactionMessageExample.QuickStart().Wait();
             // PushConsumerExample.QuickStart().Wait();
             // SimpleConsumerExample.QuickStart().Wait();
             // ProducerBenchmark.QuickStart().Wait();

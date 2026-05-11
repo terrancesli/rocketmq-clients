@@ -47,14 +47,14 @@ public:
 
   bool rollback() override;
 
-  void appendMiniTransaction(MiniTransaction mini_transaction) LOCKS_EXCLUDED(pending_transactions_mtx_) {
+  void appendMiniTransaction(MiniTransaction mini_transaction) ABSL_LOCKS_EXCLUDED(pending_transactions_mtx_) {
     absl::MutexLock lk(&pending_transactions_mtx_);
     pending_transactions_.emplace_back(std::move(mini_transaction));
   }
 
 private:
   std::weak_ptr<ProducerImpl> producer_;
-  std::vector<MiniTransaction> pending_transactions_ GUARDED_BY(pending_transactions_mtx_);
+  std::vector<MiniTransaction> pending_transactions_ ABSL_GUARDED_BY(pending_transactions_mtx_);
   absl::Mutex pending_transactions_mtx_;
 };
 

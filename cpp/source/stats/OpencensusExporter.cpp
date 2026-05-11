@@ -41,7 +41,7 @@ void OpencensusExporter::wrap(const MetricData& data, ExportMetricsServiceReques
   for (const auto& entry : data) {
     const auto& view_descriptor = entry.first;
 
-    auto metric = absl::make_unique<opencensus::proto::metrics::v1::Metric>();
+    auto metric = std::make_unique<opencensus::proto::metrics::v1::Metric>();
     auto descriptor = metric->mutable_metric_descriptor();
     descriptor->set_name(view_descriptor.name());
     descriptor->set_description(view_descriptor.description());
@@ -70,7 +70,7 @@ void OpencensusExporter::wrap(const MetricData& data, ExportMetricsServiceReques
 
     auto label_keys = descriptor->mutable_label_keys();
     for (const auto& column : view_descriptor.columns()) {
-      auto label_key = absl::make_unique<opencensus::proto::metrics::v1::LabelKey>();
+      auto label_key = std::make_unique<opencensus::proto::metrics::v1::LabelKey>();
       label_key->set_key(column.name());
       label_keys->AddAllocated(label_key.release());
     }
@@ -84,16 +84,16 @@ void OpencensusExporter::wrap(const MetricData& data, ExportMetricsServiceReques
     switch (view_data.type()) {
       case opencensus::stats::ViewData::Type::kInt64: {
         for (const auto& entry : view_data.int_data()) {
-          auto time_series_element = absl::make_unique<opencensus::proto::metrics::v1::TimeSeries>();
+          auto time_series_element = std::make_unique<opencensus::proto::metrics::v1::TimeSeries>();
           time_series_element->mutable_start_timestamp()->CopyFrom(stats_time);
           auto label_values = time_series_element->mutable_label_values();
           for (const auto& value : entry.first) {
-            auto label_value = absl::make_unique<opencensus::proto::metrics::v1::LabelValue>();
+            auto label_value = std::make_unique<opencensus::proto::metrics::v1::LabelValue>();
             label_value->set_value(value);
             label_value->set_has_value(true);
             label_values->AddAllocated(label_value.release());
           }
-          auto point = absl::make_unique<opencensus::proto::metrics::v1::Point>();
+          auto point = std::make_unique<opencensus::proto::metrics::v1::Point>();
           point->mutable_timestamp()->CopyFrom(stats_time);
           point->set_int64_value(entry.second);
           time_series_element->mutable_points()->AddAllocated(point.release());
@@ -103,16 +103,16 @@ void OpencensusExporter::wrap(const MetricData& data, ExportMetricsServiceReques
       }
       case opencensus::stats::ViewData::Type::kDouble: {
         for (const auto& entry : view_data.double_data()) {
-          auto time_series_element = absl::make_unique<opencensus::proto::metrics::v1::TimeSeries>();
+          auto time_series_element = std::make_unique<opencensus::proto::metrics::v1::TimeSeries>();
           time_series_element->mutable_start_timestamp()->CopyFrom(stats_time);
           auto label_values = time_series_element->mutable_label_values();
           for (const auto& value : entry.first) {
-            auto label_value = absl::make_unique<opencensus::proto::metrics::v1::LabelValue>();
+            auto label_value = std::make_unique<opencensus::proto::metrics::v1::LabelValue>();
             label_value->set_value(value);
             label_value->set_has_value(true);
             label_values->AddAllocated(label_value.release());
           }
-          auto point = absl::make_unique<opencensus::proto::metrics::v1::Point>();
+          auto point = std::make_unique<opencensus::proto::metrics::v1::Point>();
           point->mutable_timestamp()->CopyFrom(stats_time);
           point->set_double_value(entry.second);
           time_series_element->mutable_points()->AddAllocated(point.release());
@@ -122,23 +122,23 @@ void OpencensusExporter::wrap(const MetricData& data, ExportMetricsServiceReques
       }
       case opencensus::stats::ViewData::Type::kDistribution: {
         for (const auto& entry : view_data.distribution_data()) {
-          auto time_series_element = absl::make_unique<opencensus::proto::metrics::v1::TimeSeries>();
+          auto time_series_element = std::make_unique<opencensus::proto::metrics::v1::TimeSeries>();
           time_series_element->mutable_start_timestamp()->CopyFrom(stats_time);
           auto label_values = time_series_element->mutable_label_values();
           for (const auto& value : entry.first) {
-            auto label_value = absl::make_unique<opencensus::proto::metrics::v1::LabelValue>();
+            auto label_value = std::make_unique<opencensus::proto::metrics::v1::LabelValue>();
             label_value->set_value(value);
             label_value->set_has_value(true);
             label_values->AddAllocated(label_value.release());
           }
-          auto point = absl::make_unique<opencensus::proto::metrics::v1::Point>();
+          auto point = std::make_unique<opencensus::proto::metrics::v1::Point>();
           point->mutable_timestamp()->CopyFrom(stats_time);
-          auto distribution_value = absl::make_unique<opencensus::proto::metrics::v1::DistributionValue>();
+          auto distribution_value = std::make_unique<opencensus::proto::metrics::v1::DistributionValue>();
           distribution_value->set_count(entry.second.count());
           distribution_value->set_sum_of_squared_deviation(entry.second.sum_of_squared_deviation());
           distribution_value->set_sum(entry.second.count() * entry.second.mean());
           for (const auto& cnt : entry.second.bucket_counts()) {
-            auto bucket = absl::make_unique<opencensus::proto::metrics::v1::DistributionValue::Bucket>();
+            auto bucket = std::make_unique<opencensus::proto::metrics::v1::DistributionValue::Bucket>();
             bucket->set_count(cnt);
             distribution_value->mutable_buckets()->AddAllocated(bucket.release());
           }
@@ -170,7 +170,7 @@ void OpencensusExporter::ExportViewData(
   if (!bidi_reactor_) {
     auto ptr = client_.lock();
     if (ptr) {
-      bidi_reactor_ = absl::make_unique<MetricBidiReactor>(ptr, shared_from_this());
+      bidi_reactor_ = std::make_unique<MetricBidiReactor>(ptr, shared_from_this());
     } else {
       SPDLOG_INFO("did not create stream since the client is no longer available.");
     }

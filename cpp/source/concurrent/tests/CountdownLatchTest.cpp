@@ -28,7 +28,7 @@ ROCKETMQ_NAMESPACE_BEGIN
 class CountdownLatchTest : public testing::Test {
 public:
   void SetUp() override {
-    countdown_latch_ = absl::make_unique<CountdownLatch>(permit_);
+    countdown_latch_ = std::make_unique<CountdownLatch>(permit_);
   }
 
   void TearDown() override {

@@ -45,7 +45,7 @@ ClientManagerImpl::ClientManagerImpl(std::string resource_namespace, bool with_s
     : scheduler_(std::make_shared<SchedulerImpl>(2)),
       resource_namespace_(std::move(resource_namespace)),
       state_(State::CREATED),
-      callback_thread_pool_(absl::make_unique<ThreadPoolImpl>(thread_count)),
+      callback_thread_pool_(std::make_unique<ThreadPoolImpl>(thread_count)),
       with_ssl_(with_ssl) {
 
   certificate_verifier_ = grpc::experimental::ExternalCertificateVerifier::Create<InsecureCertificateVerifier>();
@@ -482,7 +482,7 @@ bool ClientManagerImpl::send(const std::string& target_host,
  */
 std::shared_ptr<grpc::Channel> ClientManagerImpl::createChannel(const std::string& target_host) {
   std::vector<std::unique_ptr<grpc::experimental::ClientInterceptorFactoryInterface>> interceptor_factories;
-  interceptor_factories.emplace_back(absl::make_unique<LogInterceptorFactory>());
+  interceptor_factories.emplace_back(std::make_unique<LogInterceptorFactory>());
   auto channel = grpc::experimental::CreateCustomChannelWithInterceptors(
       target_host, with_ssl_ ? channel_credential_ : grpc::InsecureChannelCredentials(), channel_arguments_,
       std::move(interceptor_factories));
@@ -775,7 +775,7 @@ void ClientManagerImpl::receiveMessage(const std::string& target_host,
                                        ReceiveMessageCallback cb) {
   SPDLOG_DEBUG("Prepare to receive message from {} asynchronously. Request: {}", target_host, request.ShortDebugString());
   RpcClientSharedPtr client = getRpcClient(target_host);
-  auto context = absl::make_unique<ReceiveMessageContext>();
+  auto context = std::make_unique<ReceiveMessageContext>();
   context->callback = std::move(cb);
   context->metadata = metadata;
   context->timeout = timeout;

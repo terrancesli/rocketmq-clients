@@ -132,7 +132,7 @@ TEST(StatsTest, testBasics) {
   std::string t2("T2");
   PublishStats metrics;
   opencensus::stats::StatsExporter::SetInterval(absl::Seconds(5));
-  opencensus::stats::StatsExporter::RegisterPushHandler(absl::make_unique<Handler>());
+  opencensus::stats::StatsExporter::RegisterPushHandler(std::make_unique<Handler>());
   std::atomic_bool stopped{false};
   auto generator = [&]() {
     while (!stopped) {

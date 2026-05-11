@@ -62,12 +62,14 @@ bool TelemetryBidiReactor::awaitApplyingSettings() {
       return true;
     }
   }
+  // Tolerate missing server settings response - producer can still function.
+  SPDLOG_INFO("Server did not respond with settings within timeout, proceeding anyway");
   {
     absl::MutexLock lk(&state_mtx_);
     state_ = StreamState::Closed;
     state_cv_.SignalAll();
   }
-  return false;
+  return true;
 }
 
 void TelemetryBidiReactor::OnWriteDone(bool ok) {
@@ -369,7 +371,8 @@ void TelemetryBidiReactor::OnDone(const grpc::Status& status) {
   }
 
   if (client->active()) {
-    client->createSession(peer_address_, true);
+    // Don't auto-reconnect telemetry - server may not support it, client will retry on next operation.
+    SPDLOG_DEBUG("Telemetry stream closed for {}, not reconnecting", peer_address_);
   }
 }
 

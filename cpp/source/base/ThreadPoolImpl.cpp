@@ -29,7 +29,7 @@ ROCKETMQ_NAMESPACE_BEGIN
 
 ThreadPoolImpl::ThreadPoolImpl(std::uint16_t workers)
     : work_guard_(
-          absl::make_unique<asio::executor_work_guard<asio::io_context::executor_type>>(context_.get_executor())),
+          std::make_unique<asio::executor_work_guard<asio::io_context::executor_type>>(context_.get_executor())),
       workers_(workers) {
     SPDLOG_INFO("ThreadPoolImpl created worker threads {}", workers);
 }

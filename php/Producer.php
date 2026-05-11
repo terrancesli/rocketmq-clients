@@ -34,15 +34,12 @@ class Producer
 
     public function init()
     {
-        /**
-         * Client ID is currently concatenated using a fixed host name to
-         * facilitate code debugging.
-         */
         $clientId = 'missyourlove' . '@' . posix_getpid() . '@' . rand(0, 10) . '@' . $this->getRandStr(10);
-        $client = new MessagingServiceClient('rmq-cn-cs02xhf2k01.cn-hangzhou.rmq.aliyuncs.com:8080', [
+        $client = new MessagingServiceClient('rmq-cn-u7c3giqmw0s-vpc.cn-hangzhou.rmq.aliyuncs.com:8080', [
             'credentials' => ChannelCredentials::createInsecure(),
             'update_metadata' => function ($metaData) use ($clientId) {
-                $metaData['headers'] = ['clientID' => $clientId]; // Pass the ClientID to the server through the header
+                $metaData['authorization'] = 'Mhbct2T68T0zsbC3:qxi3NLwMMy7sL431';
+                $metaData['headers'] = ['clientID' => $clientId];
                 return $metaData;
             }
         ]);
@@ -50,10 +47,10 @@ class Producer
         $qr = new QueryRouteRequest();
         $rs = new Resource();
         $rs->setResourceNamespace('');
-        $rs->setName('normal_topic');
+        $rs->setName('NormalTest');
         $qr->setTopic($rs);
-       $status = $client->QueryRoute($qr)->wait();
-       var_dump($status); // This prints out the response data returned by the server
+        $status = $client->QueryRoute($qr)->wait();
+        var_dump($status);
     }
 
     public function getRandStr($length){

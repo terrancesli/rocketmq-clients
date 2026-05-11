@@ -33,7 +33,7 @@ ROCKETMQ_NAMESPACE_BEGIN
 
 SchedulerImpl::SchedulerImpl(std::uint32_t worker_num)
     : work_guard_(
-          absl::make_unique<asio::executor_work_guard<asio::io_context::executor_type>>(context_.get_executor())),
+          std::make_unique<asio::executor_work_guard<asio::io_context::executor_type>>(context_.get_executor())),
       worker_num_(worker_num) {
     SPDLOG_INFO("SchedulerImpl created worker thread {}", worker_num);
 }
@@ -133,7 +133,7 @@ std::uint32_t SchedulerImpl::schedule(const std::function<void(void)>& functor, 
     tasks_.insert({id, task});
   }
   task->task_id = id;
-  task->timer = absl::make_unique<asio::steady_timer>(context_, delay);
+  task->timer = std::make_unique<asio::steady_timer>(context_, delay);
   task->scheduler = shared_from_this();
   SPDLOG_DEBUG("Timer-task[name={}] to fire in {}ms", task_name, delay.count());
   auto timer_task_weak_ptr = std::weak_ptr<TimerTask>(task);
