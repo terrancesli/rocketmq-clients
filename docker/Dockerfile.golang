@@ -1,0 +1,40 @@
+# syntax=docker/dockerfile:1
+# ============================================
+# Golang — RocketMQ Client Test
+# 国内源: goproxy.cn
+# ============================================
+FROM golang:1.22-alpine AS builder
+
+ENV GOPROXY=https://goproxy.cn,https://goproxy.io,direct
+ENV GO111MODULE=on
+
+WORKDIR /build
+
+# 先拷贝 go.mod 利用层缓存
+COPY golang/go.mod golang/go.sum ./golang/
+RUN cd golang && go mod download
+
+# 拷贝全部源码并编译
+COPY golang/ ./golang/
+RUN cd golang && go build -o /bin/producer_normal ./example/producer/normal/ \
+    && go build -o /bin/producer_fifo ./example/producer/fifo/ \
+    && go build -o /bin/producer_delay ./example/producer/delay/ \
+    && go build -o /bin/producer_transaction ./example/producer/transaction/ \
+    && go build -o /bin/consumer_push ./example/consumer/push_consumer/ \
+    && go build -o /bin/consumer_simple ./example/consumer/simple_consumer/
+
+# ---------- runtime ----------
+FROM alpine:3.19
+
+RUN apk --no-cache add ca-certificates tzdata
+
+COPY --from=builder /bin/producer_normal /bin/producer_fifo /bin/producer_delay /bin/producer_transaction /bin/consumer_push /bin/consumer_simple /bin/
+COPY docker/run-go-test.sh /bin/
+
+ENV ROCKETMQ_ENDPOINT="127.0.0.1:8080"
+ENV ROCKETMQ_ACCESS_KEY=""
+ENV ROCKETMQ_SECRET_KEY=""
+
+RUN chmod +x /bin/run-go-test.sh
+
+ENTRYPOINT ["/bin/run-go-test.sh"]

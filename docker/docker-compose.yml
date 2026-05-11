@@ -1,0 +1,103 @@
+# ============================================
+# RocketMQ 多语言客户端服务端测试集
+# ============================================
+# 使用方式:
+#   1. cp .env.example .env 并填入真实值
+#   2. docker compose up --build          # 构建并运行全部语言测试
+#   3. docker compose up java             # 只运行 Java 测试
+#   4. docker compose up --build java golang rust  # 只构建并运行指定语言
+#
+# 通过 TEST_TYPE 环境变量控制测试类型:
+#   all(默认) / normal / fifo / delay / transaction / push / simple
+# ============================================
+
+x-common-env: &common-env
+  ROCKETMQ_ENDPOINTS: ${ROCKETMQ_ENDPOINTS}
+  ROCKETMQ_ENDPOINT: ${ROCKETMQ_ENDPOINT}
+  ROCKETMQ_ACCESS_KEY: ${ROCKETMQ_ACCESS_KEY}
+  ROCKETMQ_SECRET_KEY: ${ROCKETMQ_SECRET_KEY}
+  ROCKETMQ_TOPIC_NORMAL: ${ROCKETMQ_TOPIC_NORMAL:-NormalTest}
+  ROCKETMQ_TOPIC_FIFO: ${ROCKETMQ_TOPIC_FIFO:-OrderTest}
+  ROCKETMQ_TOPIC_DELAY: ${ROCKETMQ_TOPIC_DELAY:-TimerTest}
+  ROCKETMQ_TOPIC_TRANSACTION: ${ROCKETMQ_TOPIC_TRANSACTION:-TransTest}
+
+services:
+  # ---------- Java ----------
+  java:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.java
+    env_file: .env
+    environment:
+      <<: *common-env
+      TEST_TYPE: ${TEST_TYPE:-all}
+
+  # ---------- Golang ----------
+  golang:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.golang
+    env_file: .env
+    environment:
+      <<: *common-env
+      TEST_TYPE: ${TEST_TYPE:-all}
+
+  # ---------- Rust ----------
+  rust:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.rust
+    env_file: .env
+    environment:
+      <<: *common-env
+      TEST_TYPE: ${TEST_TYPE:-all}
+
+  # ---------- Python ----------
+  python:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.python
+    env_file: .env
+    environment:
+      <<: *common-env
+      TEST_TYPE: ${TEST_TYPE:-all}
+
+  # ---------- Node.js ----------
+  nodejs:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.nodejs
+    env_file: .env
+    environment:
+      <<: *common-env
+      TEST_TYPE: ${TEST_TYPE:-all}
+
+  # ---------- C# (.NET) ----------
+  csharp:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.csharp
+    env_file: .env
+    environment:
+      <<: *common-env
+      TEST_TYPE: ${TEST_TYPE:-all}
+
+  # ---------- C++ ----------
+  cpp:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.cpp
+    env_file: .env
+    environment:
+      <<: *common-env
+      TEST_TYPE: ${TEST_TYPE:-all}
+
+  # ---------- PHP (WIP) ----------
+  php:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.php
+    env_file: .env
+    environment:
+      <<: *common-env
+      TEST_TYPE: ${TEST_TYPE:-all}

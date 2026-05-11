@@ -1,0 +1,39 @@
+# Build artifacts
+target/
+build/
+bin/
+obj/
+*.class
+*.o
+*.so
+*.a
+
+# Dependencies
+node_modules/
+vendor/
+__pycache__/
+.venv/
+.eggs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Git
+.git/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Documentation
+docs/
+all-demo/docs/
+
+# Not needed for Docker build
+.github/
+style/

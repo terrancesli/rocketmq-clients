@@ -1,0 +1,34 @@
+# syntax=docker/dockerfile:1
+# ============================================
+# C# (.NET) — RocketMQ Client Test
+# 国内源: 微软中国 CDN (NuGet), 清华源 (SDK)
+# ============================================
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS builder
+
+# 配置 NuGet 微软中国 CDN
+RUN dotnet nuget add source https://nuget.cdn.azure.cn/v3/index.json \
+    --name "MicrosoftChinaCDN" \
+    && dotnet nuget disable source nuget.org
+
+WORKDIR /build
+COPY csharp/ ./csharp/
+RUN cd csharp && dotnet build -c Release
+
+# ---------- runtime ----------
+FROM mcr.microsoft.com/dotnet/runtime:8.0
+
+WORKDIR /app
+COPY --from=builder /build/csharp/examples/bin/Release/net8.0/ ./bin/
+COPY docker/run-csharp-test.sh /app/
+
+ENV ROCKETMQ_ENDPOINT="127.0.0.1:8080"
+ENV ROCKETMQ_ACCESS_KEY=""
+ENV ROCKETMQ_SECRET_KEY=""
+ENV ROCKETMQ_TOPIC_NORMAL="NormalTest"
+ENV ROCKETMQ_TOPIC_FIFO="OrderTest"
+ENV ROCKETMQ_TOPIC_DELAY="TimerTest"
+ENV ROCKETMQ_TOPIC_TRANSACTION="TransTest"
+
+RUN chmod +x /app/run-csharp-test.sh
+
+ENTRYPOINT ["/app/run-csharp-test.sh"]

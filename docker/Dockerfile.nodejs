@@ -1,0 +1,35 @@
+# syntax=docker/dockerfile:1
+# ============================================
+# Node.js — RocketMQ Client Test
+# 国内源: npmmirror
+# ============================================
+FROM node:18-alpine AS builder
+
+# 配置 npm 淘宝镜像
+RUN npm config set registry https://registry.npmmirror.com
+
+WORKDIR /build
+COPY nodejs/package.json nodejs/package-lock.json* nodejs/tsconfig.json ./nodejs/
+RUN cd nodejs && npm install
+
+COPY nodejs/ ./nodejs/
+RUN cd nodejs && npm run init 2>/dev/null || true \
+    && npm run build 2>/dev/null || true
+
+# ---------- runtime ----------
+FROM node:18-alpine
+
+RUN npm config set registry https://registry.npmmirror.com
+
+WORKDIR /app
+COPY --from=builder /build/nodejs/ ./nodejs/
+COPY all-demo/nodejs/examples/ /app/examples/
+COPY docker/run-nodejs-test.sh /app/
+
+ENV ROCKETMQ_ENDPOINTS="127.0.0.1:8080"
+ENV ROCKETMQ_ACCESS_KEY=""
+ENV ROCKETMQ_SECRET_KEY=""
+
+RUN chmod +x /app/run-nodejs-test.sh
+
+ENTRYPOINT ["/app/run-nodejs-test.sh"]
