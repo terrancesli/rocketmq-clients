@@ -9,7 +9,7 @@ run_test() {
     local name=$1
     local script=$2
     echo "--- Running: $name ---"
-    npx ts-node /app/examples/"$script" || echo "FAILED: $name"
+    npx ts-node examples/"$script" || echo "FAILED: $name"
     echo "--- Done: $name ---"
 }
 

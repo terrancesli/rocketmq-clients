@@ -3,7 +3,7 @@
 # Rust — RocketMQ Client Test
 # 国内源: RustCC crates 镜像
 # ============================================
-FROM rust:1.74-slim AS builder
+FROM rust:1.88-slim AS builder
 
 # 配置 RustCC crates 镜像
 RUN mkdir -p ~/.cargo && cat > ~/.cargo/config.toml <<'EOF'
@@ -14,19 +14,28 @@ replace-with = 'rustcc'
 registry = "https://mirrors.rustcc.cn/crates.io-index.git"
 EOF
 
+# 替换 Debian 源为阿里云
+RUN sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
+    sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list 2>/dev/null; \
+    apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /build
 
 # 先拷贝 Cargo.toml 利用层缓存
-COPY rust/Cargo.toml rust/Cargo.lock ./rust/
-COPY rust/build.rs ./rust/
+COPY rust/Cargo.toml rust/Cargo.lock rust/build.rs ./
+RUN mkdir -p src && echo "fn main(){}" > src/main.rs \
+    && cargo build --release 2>/dev/null || true
 
-# 创建 dummy main 预下载依赖
-RUN mkdir -p rust/src && echo "fn main(){}" > rust/src/main.rs \
-    && cd rust && cargo build --release --examples || true
+# 拷贝全部源码
+COPY rust/ ./
 
-# 拷贝全部源码并编译 examples
-COPY rust/ ./rust/
-RUN cd rust && cargo build --release \
+# 用 all-demo 的示例覆盖 (all-demo 示例支持环境变量配置)
+COPY all-demo/rust/examples/ ./examples/
+
+# 编译 examples
+RUN cargo build --release \
     --example producer \
     --example fifo_producer \
     --example delay_producer \
@@ -37,19 +46,21 @@ RUN cd rust && cargo build --release \
 # ---------- runtime ----------
 FROM debian:bookworm-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
+    sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list 2>/dev/null; \
+    apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /build/rust/target/release/examples/producer /bin/
-COPY --from=builder /build/rust/target/release/examples/fifo_producer /bin/
-COPY --from=builder /build/rust/target/release/examples/delay_producer /bin/
-COPY --from=builder /build/rust/target/release/examples/transaction_producer /bin/
-COPY --from=builder /build/rust/target/release/examples/push_consumer /bin/
-COPY --from=builder /build/rust/target/release/examples/simple_consumer /bin/
+COPY --from=builder /build/target/release/examples/producer /bin/
+COPY --from=builder /build/target/release/examples/fifo_producer /bin/
+COPY --from=builder /build/target/release/examples/delay_producer /bin/
+COPY --from=builder /build/target/release/examples/transaction_producer /bin/
+COPY --from=builder /build/target/release/examples/push_consumer /bin/
+COPY --from=builder /build/target/release/examples/simple_consumer /bin/
 COPY docker/run-rust-test.sh /bin/
 
-ENV ROCKETMQ_ENDPOINTS="127.0.0.1:8080"
+ENV ROCKETMQ_ENDPOINT="127.0.0.1:8080"
 ENV ROCKETMQ_ACCESS_KEY=""
 ENV ROCKETMQ_SECRET_KEY=""
 

@@ -8,25 +8,30 @@ FROM node:18-alpine AS builder
 # 配置 npm 淘宝镜像
 RUN npm config set registry https://registry.npmmirror.com
 
-WORKDIR /build
-COPY nodejs/package.json nodejs/package-lock.json* nodejs/tsconfig.json ./nodejs/
-RUN cd nodejs && npm install
+# 使用阿里云 Alpine 镜像源
+RUN sed -i 's|dl-cdn.alpinelinux.org|mirrors.aliyun.com|g' /etc/apk/repositories \
+    && apk --no-cache add protoc protobuf-dev python3 make g++
 
+WORKDIR /build
 COPY nodejs/ ./nodejs/
-RUN cd nodejs && npm run init 2>/dev/null || true \
-    && npm run build 2>/dev/null || true
+RUN cd nodejs && npm install \
+    && npm run build 2>/dev/null || npm run tsc 2>/dev/null || true
 
 # ---------- runtime ----------
 FROM node:18-alpine
 
 RUN npm config set registry https://registry.npmmirror.com
 
+# 安装 ts-node 用于运行 TypeScript 示例
+RUN npm install -g ts-node typescript
+
 WORKDIR /app
 COPY --from=builder /build/nodejs/ ./nodejs/
-COPY all-demo/nodejs/examples/ /app/examples/
+# Copy examples into nodejs/examples/ so relative imports (../src) resolve correctly
+COPY all-demo/nodejs/examples/ ./nodejs/examples/
 COPY docker/run-nodejs-test.sh /app/
 
-ENV ROCKETMQ_ENDPOINTS="127.0.0.1:8080"
+ENV ROCKETMQ_NODEJS_CLIENT_ENDPOINTS="127.0.0.1:8080"
 ENV ROCKETMQ_ACCESS_KEY=""
 ENV ROCKETMQ_SECRET_KEY=""
 
