@@ -1,7 +1,5 @@
 {
-  "MD060": {
-    "style": "compact"
-  },
+  "MD060": false,
   "MD020": false,
   "MD013": false,
   "line-length": false
