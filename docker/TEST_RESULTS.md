@@ -67,40 +67,32 @@
 - **Tests**: Normal, FIFO, Delay, Transaction — 全部正常启动，无服务端时 Connection refused 退出
 - **Fix applied**: `ProducerSingleton.java` 修复 `setCredentialProvider(null)` NPE — 当 AK/SK 为空时不调用 `setCredentialProvider`
 
----
+### C++ ✅
 
-## FAILED
+- **Image**: `rocketmq-cpp-test` (180MB, Ubuntu 24.04 系统包 gRPC 1.51 + protobuf 3.21)
+- **Build**: ✅ Success (pkg-config shim 桥接 cmake targets, Ubuntu 24.04 原生支持 proto3 optional)
+- **Tests**: 6 个示例二进制 (producer/fifo_producer/timed_message/transactional/push_consumer/simple_consumer) 全部正常启动，无服务端时 Connection refused 退出
+- **Key fixes**:
+  1. 创建 `cpp/cmake/gRPCPkgConfigShim.cmake` — pkg-config 结果桥接为 gRPC cmake imported targets
+  2. `cpp/CMakeLists.txt` 支持 CONFIG 模式 (源码安装) 和 pkg-config 模式 (系统包) 双路径
+  3. 切换到 Ubuntu 24.04 获取 protobuf 3.21+ (原生支持 proto3 optional)
+  4. Runtime 阶段使用 `COPY --from=builder` 拷贝共享库
 
-_None. All languages passed._
+### Rust ✅
+
+- **Image**: `rocketmq-rust-test` (~100MB, rust:1.88-slim + debian:bookworm-slim)
+- **Build**: ✅ Success (直连 crates.io，无需镜像)
+- **Tests**: 4 个 producer (normal/fifo/delay/transaction) 全部正常启动，无服务端时 Connection refused 退出
+- **Key fixes**:
+  1. 移除 cargo mirror 配置 — 本机直连 crates.io 比 SJTU/rsproxy 镜像更快
+  2. `cargo fetch` 预下载依赖，利用 Docker 层缓存
+  3. 发现 edition 2024 问题 — `rust:1.74` 不支持，升级到 `rust:1.88-slim`
 
 ---
 
 ## IN PROGRESS
 
 _Nothing. All languages completed._
-
-### C++ ✅ — Ubuntu 24.04 系统包
-
-- **Dockerfile**: `docker/Dockerfile.cpp` 使用 Ubuntu 24.04 系统包 (gRPC 1.51, protobuf 3.21)
-- **关键修复**:
-  1. 切换到 Ubuntu 24.04 获取 protobuf 3.21+ (原生支持 proto3 optional)
-  2. 创建 `cpp/cmake/gRPCPkgConfigShim.cmake` — 将 pkg-config 结果桥接为 gRPC cmake imported targets
-  3. `cpp/CMakeLists.txt` 支持 CONFIG 模式 (源码安装) 和 pkg-config 模式 (系统包) 双路径
-  4. `cpp/proto/CMakeLists.txt` 简化回使用 gRPC cmake targets
-  5. Runtime 阶段使用 `COPY --from=builder` 拷贝共享库，避免手动指定包名
-- **构建产物**: `rocketmq-cpp-test` (180MB)
-- **Runtime**: 6 个示例二进制全部正常启动，无服务端时正确报告 Connection refused
-
-### Rust ✅ — 直连 crates.io (无需镜像)
-
-- **Dockerfile**: `docker/Dockerfile.rust` (rust:1.88-slim, 移除镜像配置)
-- **发现**: 本机直连 crates.io 速度正常，之前的 SJTU/rsproxy 镜像反而更慢
-- **关键修复**:
-  1. 移除 cargo mirror 配置，使用默认 crates.io 源
-  2. `cargo fetch` 预下载依赖，利用 Docker 层缓存
-  3. 移除阿里云 Debian 源替换 (默认 deb.debian.org 速度可接受)
-- **构建产物**: `rocketmq-rust-test` (~100MB runtime)
-- **Runtime**: 4 个 producer 示例全部正常启动，无服务端时正确报告 connection refused
 
 ---
 
@@ -111,10 +103,11 @@ Docker `--env-file` preserves literal quotes. `"value"` becomes the string `"val
 
 ### 2. Env Var Name Inconsistency
 Different languages use different env var names for the same configuration:
-| Var | Go | Java | Python | Node.js | C# | Rust | PHP |
-|-----|----|----|--------|---------|----|----|-----|
-| Endpoint | `ROCKETMQ_ENDPOINT` | `ROCKETMQ_ENDPOINTS` | `ROCKETMQ_ENDPOINT` | `ROCKETMQ_NODEJS_CLIENT_ENDPOINTS` | hardcoded | hardcoded | `ROCKETMQ_ENDPOINTS` |
-| Access Key | `ROCKETMQ_ACCESS_KEY` | `ROCKETMQ_ACCESS_KEY` | `ROCKETMQ_ACCESS_KEY` | `ROCKETMQ_ACCESS_KEY` | `ROCKETMQ_ACCESS_KEY` | hardcoded | `ROCKETMQ_ACCESS_KEY` |
+
+|Var|Go|Java|Python|Node.js|C#|Rust|PHP|C++|
+|-|-|-|-|-|-|-|-|-|
+|Endpoint|`ROCKETMQ_ENDPOINT`|`ROCKETMQ_ENDPOINTS`|`ROCKETMQ_ENDPOINT`|`ROCKETMQ_NODEJS_CLIENT_ENDPOINTS`|hardcoded|hardcoded|`ROCKETMQ_ENDPOINTS`|CLI `--access_point`|
+|Access Key|`ROCKETMQ_ACCESS_KEY`|`ROCKETMQ_ACCESS_KEY`|`ROCKETMQ_ACCESS_KEY`|`ROCKETMQ_ACCESS_KEY`|`ROCKETMQ_ACCESS_KEY`|hardcoded|`ROCKETMQ_ACCESS_KEY`|CLI `--access_key`|
 
 **Recommendation**: Standardize on `ROCKETMQ_ENDPOINT` (singular) for all languages.
 
