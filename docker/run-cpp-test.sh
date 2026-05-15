@@ -21,17 +21,17 @@ run_test() {
 }
 
 case "${TEST_TYPE:-all}" in
-    normal)    run_test "Normal Producer"   /app/bin/ExampleProducer "NormalTest" ;;
-    fifo)      run_test "FIFO Producer"     /app/bin/ExampleFifoProducer "OrderTest" ;;
-    delay)     run_test "Delay Producer"    /app/bin/ExampleProducerWithTimedMessage "TimerTest" ;;
-    transaction) run_test "Transaction Producer" /app/bin/ExampleProducerWithTransactionalMessage "TransTest" ;;
-    push)      run_test "Push Consumer"     /app/bin/ExamplePushConsumer "NormalTest" ;;
-    simple)    run_test "Simple Consumer"   /app/bin/ExampleSimpleConsumer "NormalTest" ;;
+    normal)    run_test "Normal Producer"   /app/bin/example_producer "NormalTest" ;;
+    fifo)      run_test "FIFO Producer"     /app/bin/example_fifo_producer "OrderTest" ;;
+    delay)     run_test "Delay Producer"    /app/bin/example_producer_with_timed_message "TimerTest" ;;
+    transaction) run_test "Transaction Producer" /app/bin/example_producer_with_transactional_message "TransTest" ;;
+    push)      run_test "Push Consumer"     /app/bin/example_push_consumer "NormalTest" ;;
+    simple)    run_test "Simple Consumer"   /app/bin/example_simple_consumer "NormalTest" ;;
     all)
-        run_test "Normal Producer"   /app/bin/ExampleProducer "NormalTest"
-        run_test "FIFO Producer"     /app/bin/ExampleFifoProducer "OrderTest"
-        run_test "Delay Producer"    /app/bin/ExampleProducerWithTimedMessage "TimerTest"
-        run_test "Transaction Producer" /app/bin/ExampleProducerWithTransactionalMessage "TransTest"
+        run_test "Normal Producer"   /app/bin/example_producer "NormalTest"
+        run_test "FIFO Producer"     /app/bin/example_fifo_producer "OrderTest"
+        run_test "Delay Producer"    /app/bin/example_producer_with_timed_message "TimerTest"
+        run_test "Transaction Producer" /app/bin/example_producer_with_transactional_message "TransTest"
         ;;
     *) echo "Unknown TEST_TYPE: $TEST_TYPE" ;;
 esac
