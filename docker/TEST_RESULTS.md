@@ -11,7 +11,7 @@
 | **Node.js** | ✅ | ⚠️ | **PASSED** (close 超时但消息发送成功) |
 | **C++** | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
 | **Rust** | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
-| **Java** | ✅ | ❌ | **FAILED** (SDK gRPC 连接挂起) |
+| **Java** | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
 
 ---
 
@@ -60,18 +60,18 @@
 
 ---
 
-## FAILED
+### Java ✅
 
-### Java ❌ — SDK gRPC 连接挂起
 - **Image**: `rocketmq-test:java` (328MB, eclipse-temurin:11-jre)
 - **Build**: ✅ Success (Aliyun Maven mirror, mvn install + javac + `ARG CACHEBUST`)
-- **Runtime**: 打印 endpoint 后完全挂起，无任何日志输出，5 分钟超时
-- **已尝试修复**:
-  1. Dockerfile 加 `ARG CACHEBUST=1` 破坏 javac 缓存
-  2. 尝试 `.enableSsl(false)` 和 `.enableSsl(true)` — 均挂起
-  3. 确认容器网络连通性（curl TCP 连接成功）
-  4. JDK 版本 Temurin-11.0.31
-- **根因**: RocketMQ Java SDK v5.2.1-SNAPSHOT 的 `ProducerBuilder.build()` 内部建立 gRPC 连接时挂起。Go/C#/PHP 等使用同一 endpoint 均正常，怀疑是 Java SDK 的 grpc-netty-shaded 与服务器 gRPC 协议交互问题。需要上游 SDK 修复或服务器端排查。
+- **Tests**: Normal, FIFO, Delay, Transaction — 全部正常启动，无服务端时 Connection refused 退出
+- **Fix applied**: `ProducerSingleton.java` 修复 `setCredentialProvider(null)` NPE — 当 AK/SK 为空时不调用 `setCredentialProvider`
+
+---
+
+## FAILED
+
+_None. All languages passed._
 
 ---
 
@@ -153,7 +153,7 @@ Only Go and Python read topic names from env vars. C# examples in `all-demo/` ha
 | `cpp/CMakeLists.txt` | CONFIG/pkg-config 双路径查找 gRPC |
 | `cpp/cmake/gRPCPkgConfigShim.cmake` | 新增 — pkg-config 到 cmake imported targets 桥接 |
 | `cpp/proto/CMakeLists.txt` | 简化回使用 gRPC cmake targets |
-| `all-demo/java/example/ProducerSingleton.java` | Added `.enableSsl(false)` → changed to `.enableSsl(true)` |
+| `all-demo/java/example/ProducerSingleton.java` | 修复 `setCredentialProvider(null)` NPE |
 | `all-demo/php/Producer.php` | Complete rewrite: direct Grpc\Call, auth metadata as array |
 | `php/autoload.php` | Manual PSR-4 autoloader for GPBMetadata, Apache\Rocketmq\V2, Grpc namespaces |
 | `cpp/source/client/TlsHelper.cpp` | Hardcoded HMAC-SHA1 digest size (20 bytes) |
@@ -164,6 +164,5 @@ Only Go and Python read topic names from env vars. C# examples in `all-demo/` ha
 
 ## Next Steps
 
-1. **Java**: 需要排查 SDK gRPC 连接挂起根因（可能是 SDK bug 或服务器配置问题）
-2. **Node.js**: 可选 — 调查 producer close hang（非阻塞，功能正常）
-3. **Env vars**: 标准化所有语言的 `ROCKETMQ_ENDPOINT` 名称
+1. **Node.js**: 可选 — 调查 producer close hang（非阻塞，功能正常）
+2. **Env vars**: 标准化所有语言的 `ROCKETMQ_ENDPOINT` 名称

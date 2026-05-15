@@ -44,26 +44,23 @@ public class ProducerSingleton {
 
     private static Producer buildProducer(TransactionChecker checker, String... topics) throws ClientException {
         final ClientServiceProvider provider = ClientServiceProvider.loadService();
-        // Credential provider is optional for client configuration.
-        // This parameter is necessary only when the server ACL is enabled. Otherwise,
-        // it does not need to be set by default.
-        SessionCredentialsProvider sessionCredentialsProvider =
-            (!ACCESS_KEY.isEmpty() && !SECRET_KEY.isEmpty())
-                ? new StaticSessionCredentialsProvider(ACCESS_KEY, SECRET_KEY) : null;
-        ClientConfiguration clientConfiguration = ClientConfiguration.newBuilder()
-            .setEndpoints(ENDPOINTS)
-            .setCredentialProvider(sessionCredentialsProvider)
-            .enableSsl(true)
-            .build();
+        ClientConfiguration clientConfiguration;
+        if (!ACCESS_KEY.isEmpty() && !SECRET_KEY.isEmpty()) {
+            SessionCredentialsProvider sessionCredentialsProvider =
+                new StaticSessionCredentialsProvider(ACCESS_KEY, SECRET_KEY);
+            clientConfiguration = ClientConfiguration.newBuilder()
+                .setEndpoints(ENDPOINTS)
+                .setCredentialProvider(sessionCredentialsProvider)
+                .build();
+        } else {
+            clientConfiguration = ClientConfiguration.newBuilder()
+                .setEndpoints(ENDPOINTS)
+                .build();
+        }
         final ProducerBuilder builder = provider.newProducerBuilder()
             .setClientConfiguration(clientConfiguration)
-            // Set the topic name(s), which is optional but recommended. It makes producer could prefetch
-            // the topic route before message publishing.
-            // For transaction producers, it is essential to set topics to ensure the reliability of the transaction
-            // checker.
             .setTopics(topics);
         if (checker != null) {
-            // Set the transaction checker.
             builder.setTransactionChecker(checker);
         }
         return builder.build();
