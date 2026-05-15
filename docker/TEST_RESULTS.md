@@ -2,16 +2,16 @@
 
 ## Summary (Latest: 2026-05-15)
 
-| Language | Image Size | Peak Memory | Build | Runtime | Status |
-| - | - | - | - | - | - |
-| **Java** | 328MB | 1.8 MiB | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
-| **Golang** | 199MB | 372 KiB | ✅ | ✅ | **PASSED** |
-| **C++** | 786MB | 4.1 MiB | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
-| **C#** | 197MB | 1.8 MiB | ✅ | ✅ | **PASSED** |
-| **Rust** | 125MB | 336 KiB | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
-| **Python** | 166MB | 1.6 MiB | ✅ | ✅ | **PASSED** |
-| **Node.js** | 327MB | 181.5 MiB | ✅ | ⚠️ | **PASSED** (close 超时但消息发送成功) |
-| **PHP** | 1.07GB | 2.0 MiB | ✅ | ✅ | **PASSED** |
+| Language | Image Size | Build | Runtime | Status |
+| - | - | - | - | - |
+| **Java** | 328MB | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
+| **Golang** | 199MB | ✅ | ✅ | **PASSED** |
+| **C++** | 786MB | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
+| **C#** | 197MB | ✅ | ✅ | **PASSED** |
+| **Rust** | 125MB | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
+| **Python** | 166MB | ✅ | ✅ | **PASSED** |
+| **Node.js** | 327MB | ✅ | ⚠️ | **PASSED** (close 超时但消息发送成功) |
+| **PHP** | 1.07GB | ✅ | ✅ | **PASSED** |
 
 ---
 
