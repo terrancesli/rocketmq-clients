@@ -53,6 +53,7 @@ public class ProducerSingleton {
         ClientConfiguration clientConfiguration = ClientConfiguration.newBuilder()
             .setEndpoints(ENDPOINTS)
             .setCredentialProvider(sessionCredentialsProvider)
+            .enableSsl(true)
             .build();
         final ProducerBuilder builder = provider.newProducerBuilder()
             .setClientConfiguration(clientConfiguration)

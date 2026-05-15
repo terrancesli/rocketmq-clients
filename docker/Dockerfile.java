@@ -5,42 +5,44 @@
 # ============================================
 FROM maven:3.9-eclipse-temurin-11 AS builder
 
-# Maven 阿里云镜像
-RUN sed -i 's|https://repo.maven.apache.org/maven2|https://maven.aliyun.com/repository/public|g' /usr/share/maven/conf/settings.xml \
-    && cat >> /usr/share/maven/conf/settings.xml <<'EOF'
+# 配置 Maven 阿里云镜像
+RUN cat > /usr/share/maven/conf/settings.xml <<'EOF'
+<settings>
   <mirrors>
     <mirror>
       <id>aliyun</id>
-      <mirrorOf>central</mirrorOf>
       <name>Aliyun Maven</name>
       <url>https://maven.aliyun.com/repository/public</url>
+      <mirrorOf>central</mirrorOf>
     </mirror>
   </mirrors>
+</settings>
 EOF
 
 WORKDIR /build
-
-# 先拷贝 pom 文件利用 Docker 层缓存
-COPY java/pom.xml java/client/pom.xml ./java/client/
-COPY java/client-sdk-compatibility/pom.xml ./java/client-sdk-compatibility/ 2>/dev/null || true
-COPY java/pom.xml ./
-
-# 预下载依赖
-RUN mvn dependency:go-offline -pl java/client -f java/pom.xml -DskipTests \
-    -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true || true
-
-# 拷贝全部源码并编译
 COPY java/ ./java/
-RUN mvn package -pl java/client -am -DskipTests \
-    -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true
+
+# 构建客户端库并安装到本地仓库
+RUN cd java && mvn install -pl client -am -DskipTests \
+    -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotbugs.skip=true -q
+
+# 拷贝依赖到 /app/lib
+RUN cd java/client && mvn dependency:copy-dependencies \
+    -DoutputDirectory=/app/lib -Dcheckstyle.skip=true -Dspotbugs.skip=true -q \
+    && cp target/rocketmq-client-java-noshade-*.jar /app/lib/
+
+# 编译 all-demo 示例 (不缓存，源码改动后必定重编译)
+ARG CACHEBUST=1
+COPY all-demo/java/example/ /tmp/examples/
+RUN rm -rf /app/classes && mkdir -p /app/classes \
+    && javac -cp "/app/lib/*" -d /app/classes /tmp/examples/*.java
 
 # ---------- runtime ----------
 FROM eclipse-temurin:11-jre
 
 WORKDIR /app
-COPY --from=builder /build/java/client/target/classes /app/classes
-COPY --from=builder /build/java/client/target/dependency /app/lib
-COPY all-demo/java/example/ /app/examples/
+COPY --from=builder /app/lib /app/lib
+COPY --from=builder /app/classes /app/classes
 COPY docker/run-java-test.sh /app/
 
 ENV ROCKETMQ_ENDPOINTS=""

@@ -33,6 +33,7 @@ public class ProducerNormalMessageExample {
     }
 
     public static void main(String[] args) throws ClientException {
+        System.out.println("[DEBUG] ROCKETMQ_ENDPOINTS=" + System.getenv("ROCKETMQ_ENDPOINTS"));
         final ClientServiceProvider provider = ClientServiceProvider.loadService();
 
         String topic = "NormalTest";

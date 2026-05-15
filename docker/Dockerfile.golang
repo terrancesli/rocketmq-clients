@@ -3,24 +3,33 @@
 # Golang — RocketMQ Client Test
 # 国内源: goproxy.cn
 # ============================================
-FROM golang:1.22-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 ENV GOPROXY=https://goproxy.cn,https://goproxy.io,direct
 ENV GO111MODULE=on
 
 WORKDIR /build
 
-# 先拷贝 go.mod 利用层缓存
+# 拷贝 golang 模块 (go.mod + library code)
 COPY golang/go.mod golang/go.sum ./golang/
-RUN cd golang && go mod download
+RUN cd golang && go mod download || true
 
-# 拷贝全部源码并编译
+# 拷贝 golang 全部源码
 COPY golang/ ./golang/
-RUN cd golang && go build -o /bin/producer_normal ./example/producer/normal/ \
+
+# 用 all-demo 的示例覆盖 (all-demo 示例支持环境变量配置)
+COPY all-demo/golang/example/ ./golang/example/
+
+# 编译 Producer
+RUN cd golang \
+    && go build -o /bin/producer_normal ./example/producer/normal/ \
     && go build -o /bin/producer_fifo ./example/producer/fifo/ \
     && go build -o /bin/producer_delay ./example/producer/delay/ \
     && go build -o /bin/producer_transaction ./example/producer/transaction/ \
+    && go build -o /bin/producer_lite ./example/producer/lite/ \
+    && go build -o /bin/producer_priority ./example/producer/priority/ \
     && go build -o /bin/consumer_push ./example/consumer/push_consumer/ \
+    && go build -o /bin/consumer_lite_push ./example/consumer/lite_push_consumer/ \
     && go build -o /bin/consumer_simple ./example/consumer/simple_consumer/
 
 # ---------- runtime ----------
@@ -28,7 +37,7 @@ FROM alpine:3.19
 
 RUN apk --no-cache add ca-certificates tzdata
 
-COPY --from=builder /bin/producer_normal /bin/producer_fifo /bin/producer_delay /bin/producer_transaction /bin/consumer_push /bin/consumer_simple /bin/
+COPY --from=builder /bin/producer_normal /bin/producer_fifo /bin/producer_delay /bin/producer_transaction /bin/producer_lite /bin/producer_priority /bin/consumer_push /bin/consumer_lite_push /bin/consumer_simple /bin/
 COPY docker/run-go-test.sh /bin/
 
 ENV ROCKETMQ_ENDPOINT="127.0.0.1:8080"
