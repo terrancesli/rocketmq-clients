@@ -32,7 +32,7 @@ class Producer
     public function init()
     {
         $this->clientId = 'php-client@' . posix_getpid() . '@0@' . $this->getRandStr(10);
-        $this->endpoint = getenv('ROCKETMQ_ENDPOINTS') ?: '127.0.0.1:8080';
+        $this->endpoint = getenv('ROCKETMQ_ENDPOINT') ?: '127.0.0.1:8080';
         // gRPC needs the endpoint in dns:/// format for proper resolution
         $grpcEndpoint = 'dns:///' . $this->endpoint;
         $this->accessKey = getenv('ROCKETMQ_ACCESS_KEY') ?: '';

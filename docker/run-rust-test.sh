@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 echo "=== Rust RocketMQ Client Test ==="
-echo "Endpoint: ${ROCKETMQ_ENDPOINTS}"
+echo "Endpoint: ${ROCKETMQ_ENDPOINT}"
 
 run_test() {
     local name=$1

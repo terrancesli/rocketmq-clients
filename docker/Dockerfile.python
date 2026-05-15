@@ -24,7 +24,7 @@ RUN cd python && pip install --no-cache-dir .
 COPY all-demo/python/example/ /app/examples/
 COPY docker/run-python-test.sh /app/
 
-ENV ROCKETMQ_ENDPOINTS="127.0.0.1:8080"
+ENV ROCKETMQ_ENDPOINT="127.0.0.1:8080"
 ENV ROCKETMQ_ACCESS_KEY=""
 ENV ROCKETMQ_SECRET_KEY=""
 

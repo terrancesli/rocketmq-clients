@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 echo "=== Node.js RocketMQ Client Test ==="
-echo "Endpoint: ${ROCKETMQ_ENDPOINTS}"
+echo "Endpoint: ${ROCKETMQ_ENDPOINT}"
 
 cd /app/nodejs
 

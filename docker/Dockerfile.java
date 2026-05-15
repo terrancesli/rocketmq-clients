@@ -45,7 +45,7 @@ COPY --from=builder /app/lib /app/lib
 COPY --from=builder /app/classes /app/classes
 COPY docker/run-java-test.sh /app/
 
-ENV ROCKETMQ_ENDPOINTS=""
+ENV ROCKETMQ_ENDPOINT=""
 ENV ROCKETMQ_ACCESS_KEY=""
 ENV ROCKETMQ_SECRET_KEY=""
 ENV ROCKETMQ_TOPIC_NORMAL="NormalTest"

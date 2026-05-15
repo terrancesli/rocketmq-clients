@@ -2,16 +2,16 @@
 
 ## Summary (Latest: 2026-05-15)
 
-| Language | Build | Runtime | Status |
-| - | - | - | - |
-| **Java** | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
-| **Golang** | ✅ | ✅ | **PASSED** |
-| **C++** | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
-| **C#** | ✅ | ✅ | **PASSED** |
-| **Rust** | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
-| **Python** | ✅ | ✅ | **PASSED** |
-| **Node.js** | ✅ | ⚠️ | **PASSED** (close 超时但消息发送成功) |
-| **PHP** | ✅ | ✅ | **PASSED** |
+| Language | Image Size | Peak Memory | Build | Runtime | Status |
+| - | - | - | - | - | - |
+| **Java** | 328MB | 1.8 MiB | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
+| **Golang** | 199MB | 372 KiB | ✅ | ✅ | **PASSED** |
+| **C++** | 786MB | 4.1 MiB | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
+| **C#** | 197MB | 1.8 MiB | ✅ | ✅ | **PASSED** |
+| **Rust** | 125MB | 336 KiB | ✅ | ✅ | **PASSED** (无服务端时 Connection refused 为预期行为) |
+| **Python** | 166MB | 1.6 MiB | ✅ | ✅ | **PASSED** |
+| **Node.js** | 327MB | 181.5 MiB | ✅ | ⚠️ | **PASSED** (close 超时但消息发送成功) |
+| **PHP** | 1.07GB | 2.0 MiB | ✅ | ✅ | **PASSED** |
 
 ---
 
@@ -101,14 +101,14 @@ Docker `--env-file` preserves literal quotes. `"value"` becomes the string `"val
 
 ### 2. Env Var Name Inconsistency
 
-Different languages use different env var names for the same configuration:
+Different languages used different env var names for the same configuration:
 
 | Var | Java | Go | C++ | C# | Rust | Python | Node.js | PHP |
 | - | - | - | - | - | - | - | - | - |
 | Endpoint | `ROCKETMQ_ENDPOINTS` | `ROCKETMQ_ENDPOINT` | CLI `--access_point` | hardcoded | hardcoded | `ROCKETMQ_ENDPOINT` | `ROCKETMQ_NODEJS_CLIENT_ENDPOINTS` | `ROCKETMQ_ENDPOINTS` |
 | Access Key | `ROCKETMQ_ACCESS_KEY` | `ROCKETMQ_ACCESS_KEY` | CLI `--access_key` | `ROCKETMQ_ACCESS_KEY` | hardcoded | `ROCKETMQ_ACCESS_KEY` | `ROCKETMQ_ACCESS_KEY` | `ROCKETMQ_ACCESS_KEY` |
 
-**Recommendation**: Standardize on `ROCKETMQ_ENDPOINT` (singular) for all languages.
+**Status**: ✅ **Resolved** — Standardized on `ROCKETMQ_ENDPOINT` (singular) across all Dockerfiles, test scripts, `.env`, `.env.example`, `docker-compose.yml`, and example code.
 
 ### 3. Topic Mapping
 
@@ -137,25 +137,37 @@ Only Go and Python read topic names from env vars. C# examples in `all-demo/` ha
 
 | File | Change |
 |------|--------|
-| `docker/Dockerfile.java` | Added `ARG CACHEBUST=1` before javac; `rm -rf /app/classes` |
+| `docker/Dockerfile.java` | Added `ARG CACHEBUST=1` before javac; `rm -rf /app/classes`; `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
+| `docker/Dockerfile.python` | `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
 | `docker/Dockerfile.csharp` | Changed COPY source from `csharp/examples/` to `all-demo/csharp/examples/` |
 | `docker/Dockerfile.nodejs` | Added Aliyun apk mirror, fixed example paths, added `ROCKETMQ_NODEJS_CLIENT_ENDPOINTS` |
 | `docker/Dockerfile.rust` | 移除镜像配置，直连 crates.io |
 | `docker/Dockerfile.php` | Complete rewrite: PECL extensions instead of composer |
 | `docker/Dockerfile.cpp` | 切换 Ubuntu 24.04 系统包 + pkg-config shim |
+| `docker/run-java-test.sh` | `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
+| `docker/run-rust-test.sh` | `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
+| `docker/run-nodejs-test.sh` | `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
+| `docker/run-python-test.sh` | `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
+| `docker/docker-compose.yml` | 移除 `ROCKETMQ_ENDPOINTS`，统一使用 `ROCKETMQ_ENDPOINT` |
+| `docker/.env` | 移除 `ROCKETMQ_ENDPOINTS`，统一使用 `ROCKETMQ_ENDPOINT` |
+| `docker/.env.example` | 移除 `ROCKETMQ_ENDPOINTS`，统一使用 `ROCKETMQ_ENDPOINT` |
+| `docker/test.sh` | 使用说明中 `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
 | `cpp/CMakeLists.txt` | CONFIG/pkg-config 双路径查找 gRPC |
 | `cpp/cmake/gRPCPkgConfigShim.cmake` | 新增 — pkg-config 到 cmake imported targets 桥接 |
 | `cpp/proto/CMakeLists.txt` | 简化回使用 gRPC cmake targets |
-| `all-demo/java/example/ProducerSingleton.java` | 修复 `setCredentialProvider(null)` NPE |
-| `all-demo/php/Producer.php` | Complete rewrite: direct Grpc\Call, auth metadata as array |
+| `all-demo/java/example/ProducerSingleton.java` | 修复 `setCredentialProvider(null)` NPE; `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
+| `all-demo/java/example/ProducerNormalMessageExample.java` | `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
+| `all-demo/java/example/QuickTest.java` | `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
+| `all-demo/java/example/PushConsumerExample.java` | `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
+| `all-demo/java/example/SimpleConsumerExample.java` | `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
+| `all-demo/php/Producer.php` | Complete rewrite: direct Grpc\Call, auth metadata as array; `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
+| `all-demo/python/example/*.py` | 全部 `ROCKETMQ_ENDPOINTS` → `ROCKETMQ_ENDPOINT` |
 | `php/autoload.php` | Manual PSR-4 autoloader for GPBMetadata, Apache\Rocketmq\V2, Grpc namespaces |
 | `cpp/source/client/TlsHelper.cpp` | Hardcoded HMAC-SHA1 digest size (20 bytes) |
-| `docker/.env` | Added `ROCKETMQ_NODEJS_CLIENT_ENDPOINTS` |
-| `docker/CHINA_MIRRORS.md` | Created — mirror configuration reference |
 
 ---
 
 ## Next Steps
 
 1. **Node.js**: 可选 — 调查 producer close hang（非阻塞，功能正常）
-2. **Env vars**: 标准化所有语言的 `ROCKETMQ_ENDPOINT` 名称
+2. **Env vars**: ✅ 已完成 — 所有语言统一使用 `ROCKETMQ_ENDPOINT`

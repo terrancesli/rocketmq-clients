@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 echo "=== Java RocketMQ Client Test ==="
-echo "Endpoint: ${ROCKETMQ_ENDPOINTS}"
+echo "Endpoint: ${ROCKETMQ_ENDPOINT}"
 
 CLASSPATH="/app/classes:/app/lib/*"
 

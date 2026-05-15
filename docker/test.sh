@@ -36,7 +36,7 @@ usage() {
     echo ""
     echo "Environment:"
     echo "  TEST_TYPE        Test type: all(默认), normal, fifo, delay, transaction, push, simple"
-    echo "  ROCKETMQ_ENDPOINTS    RocketMQ endpoint"
+    echo "  ROCKETMQ_ENDPOINT     RocketMQ endpoint"
     echo "  ROCKETMQ_ACCESS_KEY   Access key"
     echo "  ROCKETMQ_SECRET_KEY   Secret key"
     exit 1

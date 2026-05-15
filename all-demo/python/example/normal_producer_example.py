@@ -18,7 +18,7 @@ import os
 from rocketmq import ClientConfiguration, Credentials, Message, Producer
 
 if __name__ == '__main__':
-    endpoints = os.environ.get("ROCKETMQ_ENDPOINTS", "127.0.0.1:8080")
+    endpoints = os.environ.get("ROCKETMQ_ENDPOINT", "127.0.0.1:8080")
     access_key = os.environ.get("ROCKETMQ_ACCESS_KEY", "")
     secret_key = os.environ.get("ROCKETMQ_SECRET_KEY", "")
     credentials = Credentials(access_key, secret_key)

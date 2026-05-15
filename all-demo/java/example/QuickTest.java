@@ -19,7 +19,7 @@ public class QuickTest {
 
     private static final String ACCESS_KEY = System.getenv("ROCKETMQ_ACCESS_KEY");
     private static final String SECRET_KEY = System.getenv("ROCKETMQ_SECRET_KEY");
-    private static final String ENDPOINTS = System.getenv("ROCKETMQ_ENDPOINTS");
+    private static final String ENDPOINTS = System.getenv("ROCKETMQ_ENDPOINT");
 
     private static final String TOPIC_NORMAL = "NormalTest";
     private static final String TOPIC_FIFO = "OrderTest";

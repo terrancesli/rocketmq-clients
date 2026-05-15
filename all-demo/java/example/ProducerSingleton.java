@@ -37,7 +37,7 @@ public class ProducerSingleton {
     private static volatile Producer TRANSACTIONAL_PRODUCER;
     private static final String ACCESS_KEY = System.getenv("ROCKETMQ_ACCESS_KEY");
     private static final String SECRET_KEY = System.getenv("ROCKETMQ_SECRET_KEY");
-    private static final String ENDPOINTS = System.getenv("ROCKETMQ_ENDPOINTS");
+    private static final String ENDPOINTS = System.getenv("ROCKETMQ_ENDPOINT");
 
     private ProducerSingleton() {
     }
